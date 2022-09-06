@@ -1,12 +1,17 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './styles/login.css'
+import logo from './logo.png'
 
 import firebaseApp from '../../firebase-config'
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 
-import Button from '@mui/material/Button'
-import TextField from '@mui/material/TextField'
+import { Input, Button } from 'antd'
+import { UserOutlined,
+        EyeInvisibleOutlined,
+        EyeTwoTone,
+        LockOutlined  } from '@ant-design/icons'
+
 import Container from '@mui/material/Container'
 import CssBaseline from '@mui/material/CssBaseline'
 import Box from '@mui/material/Box'
@@ -32,44 +37,45 @@ const Login = ({authen}) => {
     return (
         <div className='container'>
             <Container sx={{ backgroundColor: '#fff', border: 'solid', borderRadius: '25px'}} component="main" maxWidth="xs">
-                <h1 style={{textAlign: 'center'}}>Iniciar Sesion</h1>
+                <h1>Micro Ruta</h1>
+                <img src={logo} alt="Logo"/>
+                <h2>Iniciar Sesion</h2>
                 <CssBaseline/>
                     <Box sx={{
-                        marginTop: 8,
+                        marginTop: 1,
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center'
                     }} 
                     >
-                        <TextField  
-                            margin="normal"
-                            required
-                            fullWidth
-                            id="email"
-                            label="Email Address"
-                            name="email"
-                            autoComplete="email"
-                            autoFocus
+                        <Input
+                            size="large"
+                            placeholder="Correo" 
+                            prefix={<UserOutlined />}
+                            style={{ borderRadius: '10px' }}
                             onChange={ e => setEmail(e.target.value)}
                         />
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            name="password"
-                            label="Password"
-                            type="password"
-                            id="password"
-                            autoComplete="current-password"
+                        <Input.Password
+                            size="large"
+                            placeholder="Contraseña"
+                            prefix={<LockOutlined />}
+                            iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                            style={{ marginTop: '15px', borderRadius: '10px' }}
                             onChange={ e => setPass(e.target.value)}
+                            onPressEnter={handleSignIn}
                         />
-                        <Button 
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            sx={{ mt: 3, mb: 2 }}
-                            onClick={ handleSignIn }
-                        >Sign In</Button>
+                        <Button
+                            style={{ 
+                                margin: '15px', 
+                                backgroundColor: '#282c34', 
+                                color: '#fff', 
+                                borderRadius: '6px',
+                                width: '100%'
+                            }}
+                            onClick={handleSignIn}
+                            size="large"
+                            >Iniciar Sesion
+                        </Button>
                     </Box>
             </Container>
         </div>

@@ -54,7 +54,7 @@ const LayoutMenu = () => {
         trigger={null}
         collapsible
         collapsed={collapsed}
-        breakpoint="xs"
+        breakpoint="md"
         collapsedWidth="0"
         onBreakpoint={(broken) => setCollapsed(broken)}
       >

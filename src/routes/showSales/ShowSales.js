@@ -25,7 +25,7 @@ const ShowSales = () => {
 
     const [sales, setSales] = useState(data)
     const [fechaDoc, setFechaDoc] = useState(dayjs().format('DD-MM-YYYY'))
-    const [auxFecha, setAuxFecha] = useState(dayjs().format('YYYY-MM-DD'))
+    // const [auxFecha, setAuxFecha] = useState(dayjs().format('YYYY-MM-DD'))
     const [error, setError] = useState(false)
     // const [errorHoy, setErrorHoy] = useState(false)
     
@@ -50,7 +50,7 @@ const ShowSales = () => {
                     })
                     return
                 }
-                
+                console.log("paso")
                 arrAux.map((item) => {
                     res.push({
                         id: id,
@@ -100,8 +100,9 @@ const ShowSales = () => {
     }
 
     const handleDateChange = (date) => {
+        setError(false)
         setFechaDoc(dayjs(date).format('DD-MM-YYYY')) 
-        setAuxFecha(dayjs(date).format('YYYY-MM-DD'))
+        // setAuxFecha(dayjs(date).format('YYYY-MM-DD'))
         getData()
     }
 
@@ -118,7 +119,6 @@ const ShowSales = () => {
             return
         } 
 
-        console.log(fechaDoc)
         const wb = utils.book_new()
         const ws = utils.json_to_sheet(sales)
         utils.book_append_sheet(wb, ws, fechaDoc)
@@ -138,8 +138,8 @@ const ShowSales = () => {
     useEffect(() => {
         getData()
         // setError(false)
-    }, [fechaDoc, auxFecha])
-
+    }, [fechaDoc])
+    console.log(error)
     return (
         <>
         <Title>Ventas del dia</Title>
@@ -151,7 +151,7 @@ const ShowSales = () => {
                             type='date' 
                             label="Fecha" 
                             variant="standard" 
-                            value={auxFecha} 
+                            defaultValue={dayjs().format('YYYY-MM-DD')} 
                             onChange={ e => handleDateChange(e.target.value) } 
                             sx={{ input:{ color: '#fff' } }} />
                     </Col>
