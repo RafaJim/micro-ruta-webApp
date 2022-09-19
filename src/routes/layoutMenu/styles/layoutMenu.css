@@ -1,21 +1,62 @@
 .trigger {
-    padding: 0 24px;
-    font-size: 18px;
-    line-height: 64px;
-    cursor: pointer;
-    transition: color 0.3s;
-  }
+  padding: 0 24px;
+  font-size: 18px;
+  line-height: 64px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.logout {
+  padding: 0 24px;
+  font-size: 18px;
+  line-height: 64px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
   
-  .trigger:hover {
-    color: #1890ff;
-  }
+.trigger:hover {
+  color: #1890ff;
+}
+
+.logout:hover {
+  color: #1890ff
+}
   
-  .logo {
-    height: 32px;
-    margin: 16px;
-    color: #fff;
-  }
+.logo {
+  display: flex;
+  height: 32px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.logo:hover {
+  cursor: pointer;
+}
+
+.logo h2 {
+  color: #fff;
+  margin-left: 8px;
+}
+
+.logo img {
+  width: 55px;
+  height: 55px;
+  margin-top: -7px;
+  margin-left: 7px;
+}
   
-  .site-layout .site-layout-background {
-    background: #fff;
-  }
+.site-layout .site-layout-background {
+  background: #fff;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+}
+
+.ant-layout-content {
+  margin-top: 10px;
+  margin-left: 10px;
+  /* margin: "24px 16px"; */
+  background-color: '#f0ecec';
+}

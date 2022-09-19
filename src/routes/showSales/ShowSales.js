@@ -25,9 +25,7 @@ const ShowSales = () => {
 
     const [sales, setSales] = useState(data)
     const [fechaDoc, setFechaDoc] = useState(dayjs().format('DD-MM-YYYY'))
-    // const [auxFecha, setAuxFecha] = useState(dayjs().format('YYYY-MM-DD'))
     const [error, setError] = useState(false)
-    // const [errorHoy, setErrorHoy] = useState(false)
     
     const getData = async () => {
         const docRef = doc(db, 'ventas', fechaDoc)
@@ -51,6 +49,7 @@ const ShowSales = () => {
                     return
                 }
                 console.log("paso")
+                setError(false)
                 arrAux.map((item) => {
                     res.push({
                         id: id,
@@ -72,7 +71,7 @@ const ShowSales = () => {
             .then((snapshot) => {
                 obj = snapshot.data()
                 arrAux = Object.values(obj)
-                
+                setError(false)
                 arrAux.map((item) => {
                     res.push({
                         id: id,
@@ -90,6 +89,7 @@ const ShowSales = () => {
                 setSales(res)
             })
             .catch(err => {
+                setSales({})
                 setError(true)
                 notification.error({
                     message: 'Error al obtener informacion',
@@ -103,7 +103,7 @@ const ShowSales = () => {
         setError(false)
         setFechaDoc(dayjs(date).format('DD-MM-YYYY')) 
         // setAuxFecha(dayjs(date).format('YYYY-MM-DD'))
-        getData()
+        // getData()
     }
 
     const handleExport = () => {
@@ -137,9 +137,9 @@ const ShowSales = () => {
 
     useEffect(() => {
         getData()
-        // setError(false)
+        setError(false)
     }, [fechaDoc])
-    console.log(error)
+    
     return (
         <>
         <Title>Ventas del dia</Title>

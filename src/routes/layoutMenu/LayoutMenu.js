@@ -1,5 +1,6 @@
 import React, { useState } from "react"
-import { useNavigate, Outlet } from "react-router-dom"
+import { useNavigate, Outlet, useLocation } from "react-router-dom"
+import logo from './logo.png'
 
 import firebaseApp from "../../firebase-config"
 import { getAuth, signOut } from "firebase/auth"
@@ -7,22 +8,23 @@ import { getAuth, signOut } from "firebase/auth"
 import './styles/layoutMenu.css'
 import 'antd/dist/antd.min.css'
 
-import { Layout, Menu,  } from 'antd'
+import { Layout, Menu, Divider } from 'antd'
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   DollarCircleOutlined,
   HomeOutlined,
-  LogoutOutlined,
-  FireOutlined
+  LogoutOutlined
 } from "@ant-design/icons"
 
 const { Header, Sider, Content } = Layout;
 
 const LayoutMenu = () => {
   const [collapsed, setCollapsed] = useState(false)
+  const [h2, setH2] = useState(true)
   
   const navigate = useNavigate()
+  const location = useLocation().pathname
 
   const handleLogOut = () => {
     const auth = getAuth(firebaseApp)
@@ -33,14 +35,14 @@ const LayoutMenu = () => {
 
   const items = [
     {
-      key: '1',
+      key: 'Home',
       icon: <HomeOutlined style={{ fontSize: '25px' }} />,
       label: 'Home',
       onClick: (() => navigate('/Dashboard/Home'))
 
     },
     {
-      key: "2",
+      key: "ShowSales",
       icon: <DollarCircleOutlined style={{ fontSize: '25px' }} />,
       label: "Show sales",
       onClick: (() => navigate('/Dashboard/ShowSales'))
@@ -52,47 +54,45 @@ const LayoutMenu = () => {
       <Sider
         theme="dark"
         trigger={null}
-        collapsible
         collapsed={collapsed}
         breakpoint="md"
-        collapsedWidth="0"
-        onBreakpoint={(broken) => setCollapsed(broken)}
+        collapsedWidth="75"
+        onBreakpoint={(broken) => {
+          setCollapsed(broken)
+          setH2(!broken)
+        }}
       >
-        <div className="logo"><FireOutlined style={{ fontSize: 30 }} /> Micro Ruta </div>
+        <div className="logo" onClick={() => navigate('/Dashboard/Home')} >
+          <img src={logo} alt="logo" />
+          {h2 ? <h2>Micro Ruta</h2> : null}
+        </div>
+
+        <Divider style={{ marginBottom: 1, backgroundColor: '#fff' }} />
+
         <Menu
           theme="dark"
+          defaultSelectedKeys={location.split('/')[2]}
           mode="inline"
           items={items}
+          inlineCollapsed={collapsed}
         />
       </Sider>
       <Layout className="site-layout">
-        <Header
-          className="site-layout-background"
-          style={{
-            padding: 0,
-            display: 'flex',
-            direction: 'column',
-            alignItems: 'center',
-            justifyContent: 'space-between'
-          }}
-        >
+        <Header className="site-layout-background" >
           {React.createElement(
             collapsed ? MenuUnfoldOutlined : MenuFoldOutlined,
             {
-              className: "trigger",
-              onClick: () => setCollapsed(!collapsed)
+              className: "logout",
+              onClick: () => {
+                setCollapsed(!collapsed)
+                setH2(!h2)
+              }
             }
           )}
 
-          <LogoutOutlined className="trigger" style={{fontSize: 30 }} onClick={handleLogOut} />
+          <LogoutOutlined className="logout" style={{fontSize: 30 }} onClick={handleLogOut} />
         </Header>
-        <Content
-          className=""
-          style={{
-            margin: "24px 16px",
-            backgroundColor: '#f0ecec'
-          }}
-        >
+        <Content>
           <Outlet />
         </Content>
       </Layout>
