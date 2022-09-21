@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './styles/login.css'
 import logo from './logo.png'
@@ -24,7 +24,7 @@ const Login = ({authen}) => {
 
     const navigate = useNavigate()
 
-    const handleSignIn = async () => {
+    const handleSignIn = () => {
         signInWithEmailAndPassword(auth, email, pass)
         .then((result) => {
             const token = result.user.accessToken
@@ -33,6 +33,15 @@ const Login = ({authen}) => {
         })
         .then(() => navigate('/Dashboard/Home') )        
     }
+
+    const redirect = () => {
+        localStorage.getItem('token') && navigate('/Dashboard/Home')
+        console.log("redirect")
+    }
+
+    useEffect(() => {
+        redirect()
+    }, [])
 
     return (
         <div className='container'>

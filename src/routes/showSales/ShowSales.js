@@ -36,7 +36,7 @@ const ShowSales = () => {
         let id = 0
 
         if(fechaDoc === dayjs().format('DD-MM-YYYY')) {
-            onSnapshot(docRef, (doc) => {
+            await onSnapshot(docRef, (doc) => {
                 obj = doc.data()
                 try {
                     arrAux = Object.values(obj)
@@ -48,8 +48,9 @@ const ShowSales = () => {
                     })
                     return
                 }
-                console.log("paso")
+                
                 setError(false)
+                
                 arrAux.map((item) => {
                     res.push({
                         id: id,
@@ -57,7 +58,7 @@ const ShowSales = () => {
                         frijolesElote: item.frijolesElote,
                         devoluciones: item.devoluciones,
                         botesTotal: item.botesTotal,
-                        precioTotal: "$"+item.precioTotal,
+                        precioTotal: item.precioTotal,
                         cliente: item.cliente,
                         fecha: dayjs.unix(item.fecha.seconds).format('lll')
                     })
@@ -67,7 +68,7 @@ const ShowSales = () => {
                 setSales(res)
             })
         } else {
-            getDoc(docRef)
+           await getDoc(docRef)
             .then((snapshot) => {
                 obj = snapshot.data()
                 arrAux = Object.values(obj)
@@ -79,7 +80,7 @@ const ShowSales = () => {
                         frijolesElote: item.frijolesElote,
                         devoluciones: item.devoluciones,
                         botesTotal: item.botesTotal,
-                        precioTotal: "$"+item.precioTotal,
+                        precioTotal: item.precioTotal,
                         cliente: item.cliente,
                         fecha: dayjs.unix(item.fecha.seconds).format('lll')
                     })
@@ -101,15 +102,10 @@ const ShowSales = () => {
 
     const handleDateChange = (date) => {
         setError(false)
-        setFechaDoc(dayjs(date).format('DD-MM-YYYY')) 
-        // setAuxFecha(dayjs(date).format('YYYY-MM-DD'))
-        // getData()
+        setFechaDoc(dayjs(date).format('DD-MM-YYYY'))
     }
 
     const handleExport = () => {
-        // console.log("error: ", error)
-        // let fecha
-        // error ? fecha = auxFecha : fecha = fechaDoc
         if(error) {
             notification.error({
                 message: 'Error al exportar',

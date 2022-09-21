@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { useNavigate, Outlet, useLocation } from "react-router-dom"
-import logo from './logo.png'
+import logo from './images/logo.png'
+import products from './images/products.svg'
 
 import firebaseApp from "../../firebase-config"
 import { getAuth, signOut } from "firebase/auth"
@@ -46,6 +47,12 @@ const LayoutMenu = () => {
       icon: <DollarCircleOutlined style={{ fontSize: '25px' }} />,
       label: "Show sales",
       onClick: (() => navigate('/Dashboard/ShowSales'))
+    },
+    {
+      key: 'Products',
+      icon: <img src={products} alt='products' style={{ width: '40px', marginLeft: '-10px' }} />,
+      label: 'Productos',
+      onClick: (() => navigate('/Dashboard/Products'))
     }
   ]
   
