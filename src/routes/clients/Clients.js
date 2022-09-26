@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
-import EditProductDrawer from "./components/EditProducDrawer"
-import NewProductDrawer from "./components/NewProductDrawer"
+import EditClientDrawer from "./components/EditClientDrawer"
+import NewClientDrawer from "./components/NewClientDrawer"
 
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
@@ -14,27 +14,27 @@ import { getFirestore, collection, getDocs, doc, deleteDoc } from 'firebase/fire
 
 const { Title } = Typography;
 
-const Products = () => {
-    const data = []
-    const data2 = {product: '', price: 0}
+const Clients = () => {
+    let data = []
+    let data2 = {name: '', direction: '', location: ['','']}
     const db = getFirestore(firebaseApp)
 
-    const [products, setProducts] = useState(data)
+    const [clients, setClients] = useState(data)
     const [open, setOpen] = useState(false)
-    const [openNew, setOpenNew]= useState(false)
+    const [openNew, setOpenNew] = useState(false)
     const [clientData, setClientData] = useState(data2)
     
-    const getProducts = async () => {
-        const colRef = collection(db, 'Producto')
+    const getClients = async () => {
+        const colRef = collection(db, 'cliente')
         let res = []
         let id = 0
         let arrAux = []
 
-        const products = await getDocs(colRef)
+        const clients = await getDocs(colRef)
         try{
-            products.docs.map((product) => {
+            clients.docs.map((client) => {
                 arrAux.push(
-                    product.data()
+                    client.data()
                 )
             })
         } catch(err) {
@@ -44,49 +44,50 @@ const Products = () => {
         arrAux.map((item) => {
             res.push({
                 key: id,
-                product: item.nombre,
-                price: item.precio
+                name: item.nombre,
+                direction: item.direccion,
+                location: ["Lat: "+item.localizacion.latitude+"°", " Lon: "+item.localizacion.longitude+"°"]
             })
             id++
         })
-        setProducts(res)
+        setClients(res)
     }
     
     const handleDeleteClient = (params) => {
-        const docRef = doc(db, 'Producto', params)
+        const docRef = doc(db, 'cliente', params)
         deleteDoc(docRef)
-        const res = products.filter((product) => product.product !== params )
-        setProducts(res)
+        const res = clients.filter((client) => client.name !== params )
+        setClients(res)
+    }
+
+    const handleOpenCloseDrawer = (bool) => {
+        setOpen(bool)
+        setOpenNew(bool)
     }
 
     const columns = [
-        { title: 'Producto', dataIndex: 'product', key: 'product' },
-        { title: 'Precio', dataIndex: 'price', key: 'price' },
+        { title: 'Cliente', dataIndex: 'name', key: 'name' },
+        { title: 'Direccion', dataIndex: 'direction', key: 'direction' },
+        { title: 'Localizacion', dataIndex: 'location', key: 'location' },
         { title: 'Acciones', key: 'actions', render: (params) => 
             <Space>
-                <Popconfirm title="Desea eliminar?" onConfirm={() => handleDeleteClient(params.product)}>
+                <Popconfirm title="Desea eliminar?" onConfirm={() => handleDeleteClient(params.name)}>
                     <DeleteOutlined style={{ fontSize: '20px' }} />
                 </Popconfirm>
                 <EditOutlined onClick={() => (setOpen(true), setClientData(params))} style={{ fontSize: '20px', marginLeft: '10px' }} />
             </Space>
         }
     ]
-
-    const handleOpenCloseDrawer = (bool) => {
-        setOpen(bool)
-        setOpenNew(bool)
-    }
     
     useEffect(() => {
-        getProducts()
+        getClients()
     }, [])
 
     return (
         <>
-            <Title>Productos</Title>
-            
+        <Title>Clientes</Title>
             <Container style={{ width: '100%', borderRadius: '15px' }}>
-
+            
                 <Row justify="space-between" style={{ padding: 10, borderTopLeftRadius: '10px', borderTopRightRadius: '10px', backgroundColor: '#383c44' }}>
                     <Button onClick={() => setOpenNew(true)} type="primary" icon={<PlusOutlined />} style={{ backgroundColor: 'green', borderColor: "green" }} >Cliente</Button>
                 </Row>
@@ -96,19 +97,19 @@ const Products = () => {
                         <Grid item xs={12}>
                             <Table
                                 columns={columns}
-                                dataSource={products}
+                                dataSource={clients}
                                 pagination={false}
+                                scroll={{ x: 1 }}
                             />
                         </Grid>
                     </Grid>
                 </Box>
 
-                <EditProductDrawer dataSource={clientData} openClose={handleOpenCloseDrawer} open={open} getData={getProducts} />
-                <NewProductDrawer open={openNew} openClose={handleOpenCloseDrawer} getData={getProducts} />
-
-            </Container>
+                <EditClientDrawer dataSource={clientData} open={open} openClose={handleOpenCloseDrawer} getData={getClients} />
+                <NewClientDrawer open={openNew} openClose={handleOpenCloseDrawer} getData={getClients} />
+        </Container>
         </>
     )
 }
  
-export default Products;
+export default Clients

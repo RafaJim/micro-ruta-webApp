@@ -5,7 +5,8 @@ import GuardedRoutes from './GuardedRoutes'
 import Home from './routes/home/Home';
 import ShowSales from './routes/showSales/ShowSales'
 import LayoutMenu from './routes/layoutMenu/LayoutMenu'
-import Products from './routes/products/Products'
+import Clients from './routes/clients/Clients'
+import Products from './routes/products/Products';
 
 // import firebaseApp from './firebase-config';
 // import { getAuth, onAuthStateChanged } from 'firebase/auth'
@@ -29,7 +30,8 @@ function AppRoutes() {
             <Route path='/Dashboard' element={ <LayoutMenu/> } >
               <Route path='/Dashboard/Home' element={ <Home/> } />
               <Route path='/Dashboard/ShowSales' element={ <ShowSales/> } />
-              <Route path='/Dashboard/Products' element={ <Products/> } />
+              <Route path='/Dashboard/Clients' element={ <Clients/> } />
+              <Route path='/Dashboard/Products' element={ <Products /> } />
             </Route>
         </Route>
       </Routes>

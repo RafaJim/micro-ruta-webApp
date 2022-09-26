@@ -15,7 +15,8 @@ import {
   MenuUnfoldOutlined,
   DollarCircleOutlined,
   HomeOutlined,
-  LogoutOutlined
+  LogoutOutlined,
+  UserOutlined
 } from "@ant-design/icons"
 
 const { Header, Sider, Content } = Layout;
@@ -47,6 +48,12 @@ const LayoutMenu = () => {
       icon: <DollarCircleOutlined style={{ fontSize: '25px' }} />,
       label: "Show sales",
       onClick: (() => navigate('/Dashboard/ShowSales'))
+    },
+    {
+      key: 'Clients',
+      icon: <UserOutlined style={{ fontSize: '25px' }} />,
+      label: 'Clientes',
+      onClick: (() => navigate('/Dashboard/Clients'))
     },
     {
       key: 'Products',
