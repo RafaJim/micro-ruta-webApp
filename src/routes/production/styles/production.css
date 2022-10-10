@@ -1,0 +1,9 @@
+.productionContainer {
+    display: flex;
+}
+
+.insertProduction {
+    border-style: groove;
+    width: 220px;
+    padding: 10px;
+}

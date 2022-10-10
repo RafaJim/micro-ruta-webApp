@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useNavigate, Outlet, useLocation } from "react-router-dom"
 import logo from './images/logo.png'
 import products from './images/products.svg'
@@ -14,9 +14,10 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   DollarCircleOutlined,
-  HomeOutlined,
   LogoutOutlined,
-  UserOutlined
+  UserOutlined,
+  DashboardOutlined,
+  AuditOutlined
 } from "@ant-design/icons"
 
 const { Header, Sider, Content } = Layout;
@@ -24,6 +25,7 @@ const { Header, Sider, Content } = Layout;
 const LayoutMenu = () => {
   const [collapsed, setCollapsed] = useState(false)
   const [h2, setH2] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(localStorage.getItem('isAdmin'))
   
   const navigate = useNavigate()
   const location = useLocation().pathname
@@ -35,18 +37,40 @@ const LayoutMenu = () => {
     window.location.reload()
   }
 
+  const items2 = [
+    {
+      key: 'Production',
+      icon: <AuditOutlined style={{ fontSize: '25px' }} />,
+      label: 'Produccion',
+      onClick: (() => navigate('/Dashboard/Production'))
+
+    },
+    {
+      key: 'Kilometers',
+      icon: <DashboardOutlined style={{ fontSize: '25px' }} />,
+      label: 'Kilometraje',
+      onClick: (() => navigate('/Dashboard/KmReg'))
+    }
+  ]
+
   const items = [
     {
-      key: 'Home',
-      icon: <HomeOutlined style={{ fontSize: '25px' }} />,
-      label: 'Home',
-      onClick: (() => navigate('/Dashboard/Home'))
+      key: 'Production',
+      icon: <AuditOutlined style={{ fontSize: '25px' }} />,
+      label: 'Produccion',
+      onClick: (() => navigate('/Dashboard/Production'))
 
+    },
+    {
+      key: 'Kilometers',
+      icon: <DashboardOutlined style={{ fontSize: '25px' }} />,
+      label: 'Kilometraje',
+      onClick: (() => navigate('/Dashboard/KmReg'))
     },
     {
       key: "ShowSales",
       icon: <DollarCircleOutlined style={{ fontSize: '25px' }} />,
-      label: "Show sales",
+      label: "Ventas",
       onClick: (() => navigate('/Dashboard/ShowSales'))
     },
     {
@@ -87,7 +111,7 @@ const LayoutMenu = () => {
           theme="dark"
           defaultSelectedKeys={location.split('/')[2]}
           mode="inline"
-          items={items}
+          items={ isAdmin ? items:items2}
           inlineCollapsed={collapsed}
         />
       </Sider>

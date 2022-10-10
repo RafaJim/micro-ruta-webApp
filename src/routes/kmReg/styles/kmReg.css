@@ -1,0 +1,13 @@
+.kmReg {
+    padding: 15px;
+    border-style: groove;
+    width: 250px;
+}
+
+.kmReg Input {
+    width: 200px;
+}
+
+.kmReg Button {
+    margin-top: 20px;
+}

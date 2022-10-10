@@ -27,16 +27,18 @@ const Login = ({authen}) => {
     const handleSignIn = () => {
         signInWithEmailAndPassword(auth, email, pass)
         .then((result) => {
+            const userUID = result.user.uid
             const token = result.user.accessToken
             localStorage.setItem("token", token)
+            if(userUID === 'pj11HPPJyKUnx2gZ3Gm8f7dq9q82') localStorage.setItem("isAdmin", "true")
+            else localStorage.setItem("isAdmin", "")
             authen()
         })
-        .then(() => navigate('/Dashboard/Home') )        
+        .then(() => navigate('/Dashboard') )        
     }
 
     const redirect = () => {
-        localStorage.getItem('token') && navigate('/Dashboard/Home')
-        console.log("redirect")
+        localStorage.getItem('token') && navigate('/Dashboard')
     }
 
     useEffect(() => {
