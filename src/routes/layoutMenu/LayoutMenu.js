@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { useNavigate, Outlet, useLocation } from "react-router-dom"
 import logo from './images/logo.png'
 import products from './images/products.svg'
@@ -17,7 +17,8 @@ import {
   LogoutOutlined,
   UserOutlined,
   DashboardOutlined,
-  AuditOutlined
+  AuditOutlined,
+  CarOutlined
 } from "@ant-design/icons"
 
 const { Header, Sider, Content } = Layout;
@@ -25,7 +26,7 @@ const { Header, Sider, Content } = Layout;
 const LayoutMenu = () => {
   const [collapsed, setCollapsed] = useState(false)
   const [h2, setH2] = useState(true)
-  const [isAdmin, setIsAdmin] = useState(localStorage.getItem('isAdmin'))
+  const [isAdmin] = useState(localStorage.getItem('isAdmin'))
   
   const navigate = useNavigate()
   const location = useLocation().pathname
@@ -81,9 +82,41 @@ const LayoutMenu = () => {
     },
     {
       key: 'Products',
-      icon: <img src={products} alt='products' style={{ width: '40px', marginLeft: '-10px' }} />,
+      icon: <img src={products} alt='products' style={{ width: '35px', marginLeft: '-5px' }} />,
       label: 'Productos',
       onClick: (() => navigate('/Dashboard/Products'))
+    },
+    {
+      key: "Routes",
+      icon: <CarOutlined style={{ fontSize: '25px' }} />,
+      label: "Rutas",
+      children: [
+        {
+          key: "Monday",
+          label: "Lunes",
+          onClick: (() => navigate('/Dashboard/dayRoutes/Monday'))
+        },
+        {
+          key: "Tuesday",
+          label: "Martes",
+          onClick: (() => navigate('/Dashboard/dayRoutes/Tuesday'))
+        },
+        {
+          key: "Wednesday",
+          label: "Miercoles",
+          onClick: (() => navigate('/Dashboard/dayRoutes/Wednesday'))
+        },
+        {
+          key: "Thursday ",
+          label: "Jueves",
+          onClick: (() => navigate('/Dashboard/dayRoutes/Thursday'))
+        },
+        {
+          key: "Friday ",
+          label: "Viernes",
+          onClick: (() => navigate('/Dashboard/dayRoutes/Friday'))
+        }
+      ]
     }
   ]
   
@@ -100,7 +133,7 @@ const LayoutMenu = () => {
           setH2(!broken)
         }}
       >
-        <div className="logo" onClick={() => navigate('/Dashboard/Home')} >
+        <div className="logo" onClick={() => navigate('/Dashboard')} >
           <img src={logo} alt="logo" />
           {h2 ? <h2>Micro Ruta</h2> : null}
         </div>

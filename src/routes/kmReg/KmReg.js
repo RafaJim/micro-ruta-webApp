@@ -1,4 +1,5 @@
 import './styles/kmReg.css'
+import KmTable from './components/KmTable'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 
@@ -14,6 +15,7 @@ const KmReg = () => {
 
     const [kmInit, setKmInit] = useState()
     const [kmFinal, setKmFinal] = useState()
+    const [isAdmin, setIsAdmin] = useState(localStorage.getItem('isAdmin'))
 
     const handleSetKms = async() => {
         const today = dayjs().format('DD-MM-YYYY')
@@ -39,30 +41,20 @@ const KmReg = () => {
         }
     }
 
-    const test = async() => {
-        try {
-            const docRef2 = doc(db, 'ordenEntregas', 'jueves')
-            const docSnap = await getDoc(docRef2)
-            console.log(docSnap.data())
-        } catch(err) {
-    
-        }
-    }
-
-    test()
-
-
     return (
         <>
             <Title>Registro de kilometraje</Title>
-            <div className='kmReg'>
-                <h4>Kilometraje inicial:</h4>
-                <Input onChange={e => setKmInit(e.target.value)}/>
+            <div className='kmRegContainer'>
+                <div className='kmReg'>
+                    <h4>Kilometraje inicial:</h4>
+                    <Input onChange={e => setKmInit(e.target.value)}/>
 
-                <h4>Kilometraje final:</h4>
-                <Input onChange={e => setKmFinal(e.target.value)}/>
+                    <h4>Kilometraje final:</h4>
+                    <Input onChange={e => setKmFinal(e.target.value)}/>
 
-                <Button className='btnReg' type="primary" onClick={handleSetKms}>Registrar</Button>
+                    <Button className='btnReg' type="primary" onClick={handleSetKms}>Registrar</Button>
+                </div>
+                { isAdmin && <KmTable />}
             </div>
         </>
     )

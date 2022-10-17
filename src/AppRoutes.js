@@ -8,6 +8,11 @@ import LayoutMenu from './routes/layoutMenu/LayoutMenu'
 import Clients from './routes/clients/Clients'
 import Products from './routes/products/Products'
 import KmReg from './routes/kmReg/KmReg'
+import Monday from './routes/dayRoutes/monday/Monday'
+import Tuesday from './routes/dayRoutes/tuesday/Tuesday'
+import Wednesday from './routes/dayRoutes/wednesday/Wednesday'
+import Thursday from './routes/dayRoutes/thursday/Thursday'
+import Friday from './routes/dayRoutes/friday/Friday'
 
 function AppRoutes() {
   const [isAuthenticated, setIsAutheticated] = useState(localStorage.getItem('token'))
@@ -29,6 +34,11 @@ function AppRoutes() {
               <Route path='/Dashboard/Clients' element={ <Clients/> } />
               <Route path='/Dashboard/Products' element={ <Products /> } />
               <Route path='/Dashboard/KmReg' element={ <KmReg /> } />
+              <Route path='/Dashboard/dayRoutes/Monday' element={ <Monday /> } />
+              <Route path='/Dashboard/dayRoutes/Tuesday' element={ <Tuesday /> } />
+              <Route path='/Dashboard/dayRoutes/Wednesday' element={ <Wednesday /> } />
+              <Route path='/Dashboard/dayRoutes/Thursday' element={ <Thursday /> } />
+              <Route path='/Dashboard/dayRoutes/Friday' element={ <Friday /> } />
             </Route>
         </Route>
       </Routes>

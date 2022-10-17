@@ -1,4 +1,5 @@
 import { useEffect , useState } from "react"
+import './styles/showSales.css'
 import { utils, writeFile } from 'xlsx'
 import dayjs from 'dayjs'
 import localizedFormat from 'dayjs/plugin/localizedFormat'
@@ -54,13 +55,17 @@ const ShowSales = () => {
                 arrAux.map((item) => {
                     res.push({
                         id: id,
-                        frijoles: item.frijoles,
-                        frijolesElote: item.frijolesElote,
-                        devoluciones: item.devoluciones,
-                        botesTotal: item.botesTotal,
-                        precioTotal: item.precioTotal,
                         cliente: item.cliente,
-                        fecha: dayjs.unix(item.fecha.seconds).format('lll')
+                        fecha: dayjs.unix(item.fecha.seconds).format('lll'),
+                        frijolesEntrega: item.frijolesEntrega,
+                        frijolesDevolucion: item.frijolesDevolucion,
+                        frijolesEloteEntrega: item.frijolesEloteEntrega,
+                        frijolesEloteDevolucion: item.frijolesEloteDevolucion,
+                        totalFrijol: item.totalFrijol,
+                        totalFrijolElote: item.totalFrijolElote,
+                        total: item.total,
+                        efectivoRecibido: item.efectivoRecibido,
+                        cambio: item.cambio,
                     })
                     id++
                     return null
@@ -76,13 +81,17 @@ const ShowSales = () => {
                 arrAux.map((item) => {
                     res.push({
                         id: id,
-                        frijoles: item.frijoles,
-                        frijolesElote: item.frijolesElote,
-                        devoluciones: item.devoluciones,
-                        botesTotal: item.botesTotal,
-                        precioTotal: item.precioTotal,
                         cliente: item.cliente,
-                        fecha: dayjs.unix(item.fecha.seconds).format('lll')
+                        fecha: dayjs.unix(item.fecha.seconds).format('lll'),
+                        frijolesEntrega: item.frijoles,
+                        frijolesDevolucion: item.frijolesDevolucion,
+                        frijolesEloteEntrega: item.frijolesEloteEntrega,
+                        frijolesEloteDevolucion: item.frijolesEloteDevolucion,
+                        totalFrijol: item.totalFrijol,
+                        totalFrijolElote: item.totalFrijolElote,
+                        total: item.total,
+                        efectivoRecibido: item.efectivoRecibido,
+                        cambio: item.cambio,
                     })
                     id++
                     return null
@@ -122,13 +131,17 @@ const ShowSales = () => {
     }
 
     const columns = [
-        { field: 'cliente', headerName: 'Cliente', width: 120 },
-        { field: 'frijoles', headerName: 'Frijoles', width: 70 },
-        { field: 'frijolesElote', headerName: 'Frijoles con elote', width: 140 },
-        { field: 'botesTotal', headerName: 'Total de botes', width: 140},
-        { field: 'devoluciones', headerName: 'Devoluciones', width: 120},
-        { field: 'fecha', headerName: 'Fecha venta', width: 180 },
-        { field: 'precioTotal', headerName: 'Precio total', width: 120}
+        { field: 'cliente', headerName: 'Cliente', width: 120, headerAlign: 'center' },
+        { field: 'fecha', headerName: 'Fecha venta', width: 180, headerAlign: 'center' },
+        { field: 'frijolesEntrega', headerName: 'Frijoles', width: 70, headerAlign: 'center' },
+        { field: 'frijolesDevolucion', headerName: 'Frijoles devueltos', width: 130, headerAlign: 'center' },
+        { field: 'frijolesEloteEntrega', headerName: 'Frijoles con elote', width: 130, headerAlign: 'center' },
+        { field: 'frijolesEloteDevolucion', headerName: 'Frijoles con elote devueltos', width: 190, headerAlign: 'center' },
+        { field: 'totalFrijol', headerName: 'Total frijol', width: 80, headerAlign: 'center' },
+        { field: 'totalFrijolElote', headerName: 'Total frijol con elote', width: 150, headerAlign: 'center' },
+        { field: 'total', headerName: 'Total de la venta', width: 120, headerAlign: 'center' },
+        { field: 'efectivoRecibido', headerName: 'Efectivo recibido', width: 120, headerAlign: 'center' },
+        { field: 'cambio', headerName: 'Cambio', width: 70, headerAlign: 'center' },
     ]
 
     useEffect(() => {
@@ -156,7 +169,7 @@ const ShowSales = () => {
                     </Col>
                 </Row>
 
-            <Box sx={{ display: 'flex', height: 500, borderStyle: 'groove', backgroundColor: '#fff' }}>
+            <Box sx={{ display: 'flex', borderStyle: 'groove', backgroundColor: '#fff' }}>
                 <Grid container >
                     <Grid item xs={12}>
                         <DataGrid
@@ -164,6 +177,9 @@ const ShowSales = () => {
                             columns={columns}
                             pageSize={7}
                             rowsPerPageOptions={[7]}
+                            disableSelectionOnClick
+                            autoHeight={true}
+                            sx={{ '& .MuiDataGrid-cell--textCenter': { align:"center" } }}
                         />
                     </Grid>
                 </Grid>

@@ -6,7 +6,7 @@ import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
 
-import { notification, Col, Row, Typography, Table, Popconfirm, Space, Button } from 'antd'
+import { Row, Typography, Table, Popconfirm, Space, Button } from 'antd'
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons"
 
 import firebaseApp from "../../firebase-config"
@@ -100,6 +100,7 @@ const Clients = () => {
                                 dataSource={clients}
                                 pagination={false}
                                 scroll={{ x: 1 }}
+                                // bordered
                             />
                         </Grid>
                     </Grid>

@@ -1,3 +1,7 @@
+.kmRegContainer {
+    display: flex;
+}
+
 .kmReg {
     padding: 15px;
     border-style: groove;
