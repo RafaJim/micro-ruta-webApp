@@ -11,6 +11,7 @@ const db = getFirestore(firebaseApp)
 const OrderRouteTable = ({updateTable, day, dataSource}) => {
 
     const [newOrder, setNewOrder] = useState()
+    // const [oldOrder, setOldOrder] = useState()
 
     const onChangeSwitch = async (checked, client) => {
         const docRef = doc(db, day, client)
@@ -22,9 +23,61 @@ const OrderRouteTable = ({updateTable, day, dataSource}) => {
     const handleEditOrder = (client) => {
         const docRef = doc(db, day, client)
         updateDoc(docRef, { ordenEntrega: parseInt(newOrder) })
+        let oldOrder
+        dataSource.map(item => {
+            if(item.name === client) oldOrder = item.order
+        })
+        let arr = []
+
+        //caso si quiere cambiar elemento al inicio
+        if(newOrder == 1) {
+            arr = dataSource.filter(item => item.order < oldOrder)
+            arr.map(item => {
+                if(item.name !== client) {
+                    const docRef = doc(db, day, item.name)
+                    updateDoc(docRef, { ordenEntrega: parseInt(item.order+1) })
+                }
+            })
+        }
+
+        if(newOrder != 1 && newOrder != dataSource.length) {
+
+            //caso si quiere cambiar elemento 1 fila abajo
+            if(newOrder == oldOrder+1) {
+                arr = dataSource.filter(item => item.order == newOrder)
+                const docRef = doc(db, day, arr[0].name)
+                updateDoc(docRef, { ordenEntrega: parseInt(arr[0].order-1) })
+            }
+
+            //caso si quiere cambiar elemento 1 fil arriba
+            else if(newOrder == oldOrder-1) {
+                arr = dataSource.filter(item => item.order == newOrder)
+                const docRef = doc(db, day, arr[0].name)
+                updateDoc(docRef, { ordenEntrega: parseInt(arr[0].order+1) })
+            }
+
+            else {
+                dataSource.map(item => {
+                    if(item.name !== client && item.order >= newOrder ) {
+                        const docRef = doc(db, day, item.name)
+                        updateDoc(docRef, { ordenEntrega: parseInt(item.order+1) })
+                    }
+                })
+            }
+        }
+
+        //caso si quiere cambiar elemento al final
+        if(newOrder == dataSource.length) {
+            arr = dataSource.filter(item => item.order > oldOrder)
+            arr.map(item => {
+                if(item.name !== client) {
+                    const docRef = doc(db, day, item.name)
+                    updateDoc(docRef, { ordenEntrega: parseInt(item.order-1) })
+                }
+            })
+        }
+        
         updateTable()
-        
-        
     }
 
     const columns = [
