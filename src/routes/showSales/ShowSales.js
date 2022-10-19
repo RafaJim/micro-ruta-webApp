@@ -1,5 +1,7 @@
 import { useEffect , useState } from "react"
 import './styles/showSales.css'
+import BalanceDay from './components/BalanceDay'
+
 import { utils, writeFile } from 'xlsx'
 import dayjs from 'dayjs'
 import localizedFormat from 'dayjs/plugin/localizedFormat'
@@ -10,7 +12,7 @@ import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
 
-import { notification, Col, Row, Typography } from 'antd'
+import { notification, Col, Row, Typography, Card } from 'antd'
 import {
     DownloadOutlined
   } from "@ant-design/icons"
@@ -25,6 +27,7 @@ const ShowSales = () => {
     const db = getFirestore(firebaseApp)
 
     const [sales, setSales] = useState(data)
+    const [inventoryDay, setInventoryDay] = useState(data)
     const [fechaDoc, setFechaDoc] = useState(dayjs().format('DD-MM-YYYY'))
     const [error, setError] = useState(false)
     
@@ -34,6 +37,7 @@ const ShowSales = () => {
         let obj = {}
         let arrAux = []
         let res = []
+        let resInventory = []
         let id = 0
 
         if(fechaDoc === dayjs().format('DD-MM-YYYY')) {
@@ -78,6 +82,7 @@ const ShowSales = () => {
                 obj = snapshot.data()
                 arrAux = Object.values(obj)
                 setError(false)
+
                 arrAux.map((item) => {
                     res.push({
                         id: id,
@@ -93,13 +98,25 @@ const ShowSales = () => {
                         efectivoRecibido: item.efectivoRecibido,
                         cambio: item.cambio,
                     })
+
+                    resInventory.push({
+                        id: id,
+                        lunes: item.inventarioDia['lunes'],
+                        martes: item.inventarioDia['martes'],
+                        miercoles: item.inventarioDia['miercoles'],
+                        jueves: item.inventarioDia['jueves'],
+                        viernes: item.inventarioDia['viernes']
+                    })
+
                     id++
                     return null
                 })
                 setSales(res)
+                setInventoryDay(resInventory)
             })
             .catch(err => {
                 setSales({})
+                setInventoryDay({})
                 setError(true)
                 notification.error({
                     message: 'Error al obtener informacion',
@@ -114,7 +131,7 @@ const ShowSales = () => {
         setFechaDoc(dayjs(date).format('DD-MM-YYYY'))
     }
 
-    const handleExport = () => {
+    const handleExport = (docName, docContent) => {
         if(error) {
             notification.error({
                 message: 'Error al exportar',
@@ -125,9 +142,9 @@ const ShowSales = () => {
         } 
 
         const wb = utils.book_new()
-        const ws = utils.json_to_sheet(sales)
+        const ws = utils.json_to_sheet(docContent)
         utils.book_append_sheet(wb, ws, fechaDoc)
-        writeFile(wb, "Frijoles_" + fechaDoc + ".xlsx")
+        writeFile(wb, docName + fechaDoc + ".xlsx")
     }
 
     const columns = [
@@ -142,6 +159,14 @@ const ShowSales = () => {
         { field: 'total', headerName: 'Total de la venta', width: 120, headerAlign: 'center' },
         { field: 'efectivoRecibido', headerName: 'Efectivo recibido', width: 120, headerAlign: 'center' },
         { field: 'cambio', headerName: 'Cambio', width: 70, headerAlign: 'center' },
+    ]
+
+    const columnsInventory = [
+        { field: 'lunes', headerName: 'Lunes', width: 90, headerAlign: 'center' },
+        { field: 'martes', headerName: 'Martes', width: 90, headerAlign: 'center' },
+        { field: 'miercoles', headerName: 'Miercoles', width: 90, headerAlign: 'center' },
+        { field: 'jueves', headerName: 'Jueves', width: 90, headerAlign: 'center' },
+        { field: 'viernes', headerName: 'Viernes', width: 90, headerAlign: 'center' },
     ]
 
     useEffect(() => {
@@ -165,7 +190,7 @@ const ShowSales = () => {
                             sx={{ input:{ color: '#fff' } }} />
                     </Col>
                     <Col>
-                        <DownloadOutlined onClick={handleExport} style={{ fontSize: 30, color: '#fff' }} />
+                        <DownloadOutlined onClick={() => handleExport('Frijoles_', sales)} style={{ fontSize: 30, color: '#fff' }} />
                     </Col>
                 </Row>
 
@@ -184,6 +209,27 @@ const ShowSales = () => {
                     </Grid>
                 </Grid>
             </Box>
+
+            <Card
+                title="Inventario de etiquetas"
+                bordered='true'
+                style={{ width: '510px' }}
+                headStyle={{ backgroundColor: '#383c44', color: '#fff', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}
+                extra={<DownloadOutlined onClick={() => handleExport('Inventario_', inventoryDay)} style={{ fontSize: 30, color: '#fff' }} />}
+            >
+                <DataGrid
+                    rows={inventoryDay}
+                    columns={columnsInventory}
+                    pageSize={7}
+                    rowsPerPageOptions={[7]}
+                    disableSelectionOnClick
+                    autoHeight={true}
+                    sx={{ '& .MuiDataGrid-cell--textCenter': { align:"center" } }}
+                />
+            </Card>
+
+            <BalanceDay fechaDoc={fechaDoc} error={error} />
+
         </Container>
         </>
     )
