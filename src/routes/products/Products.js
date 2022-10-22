@@ -6,7 +6,7 @@ import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
 
-import { notification, Col, Row, Typography, Table, Popconfirm, Space, Button } from 'antd'
+import { Col, Row, Typography, Table, Popconfirm, Space, Button, Card } from 'antd'
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons"
 
 import firebaseApp from "../../firebase-config"
@@ -76,6 +76,12 @@ const Products = () => {
         setOpen(bool)
         setOpenNew(bool)
     }
+
+    const titleContent = (
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Button onClick={() => setOpenNew(true)} type="primary" icon={<PlusOutlined />} style={{ backgroundColor: 'green', borderColor: "green" }} >Producto</Button>
+        </div>
+    )
     
     useEffect(() => {
         getProducts()
@@ -84,29 +90,27 @@ const Products = () => {
     return (
         <>
             <Title>Productos</Title>
-            
-            <Container style={{ width: '100%', borderRadius: '15px' }}>
 
-                <Row justify="space-between" style={{ padding: 10, borderTopLeftRadius: '10px', borderTopRightRadius: '10px', backgroundColor: '#383c44' }}>
-                    <Button onClick={() => setOpenNew(true)} type="primary" icon={<PlusOutlined />} style={{ backgroundColor: 'green', borderColor: "green" }} >Cliente</Button>
-                </Row>
+            <Row>
+                <Col span={24}>
+                    <Card
+                        title = {titleContent}
+                        bordered='true'
+                        headStyle={{ backgroundColor: '#383c44', color: '#fff', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}
+                    >
+                        <Table
+                            columns={columns}
+                            dataSource={products}
+                            pagination={false}
+                            scroll={{ x: 1 }}
+                            bordered
+                        />
+                    </Card>
+                </Col>
+            </Row>
 
-                <Box sx={{ display: 'flex', borderStyle: 'groove', backgroundColor: '#fff' }}>
-                    <Grid container >
-                        <Grid item xs={12}>
-                            <Table
-                                columns={columns}
-                                dataSource={products}
-                                pagination={false}
-                            />
-                        </Grid>
-                    </Grid>
-                </Box>
-
-                <EditProductDrawer dataSource={clientData} openClose={handleOpenCloseDrawer} open={open} getData={getProducts} />
-                <NewProductDrawer open={openNew} openClose={handleOpenCloseDrawer} getData={getProducts} />
-
-            </Container>
+            <EditProductDrawer dataSource={clientData} openClose={handleOpenCloseDrawer} open={open} getData={getProducts} />
+            <NewProductDrawer open={openNew} openClose={handleOpenCloseDrawer} getData={getProducts} />
         </>
     )
 }

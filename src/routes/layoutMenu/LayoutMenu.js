@@ -26,7 +26,7 @@ const { Header, Sider, Content } = Layout;
 const LayoutMenu = () => {
   const [collapsed, setCollapsed] = useState(false)
   const [h2, setH2] = useState(true)
-  const [isAdmin] = useState(localStorage.getItem('isAdmin'))
+  const [isAdmin] = useState(localStorage.getItem('UID'))
   
   const navigate = useNavigate()
   const location = useLocation().pathname
@@ -163,7 +163,7 @@ const LayoutMenu = () => {
 
           <LogoutOutlined className="logout" style={{fontSize: 30 }} onClick={handleLogOut} />
         </Header>
-        <Content>
+        <Content style={{ padding: '3%', overflow: 'auto' }}>
           <Outlet />
         </Content>
       </Layout>

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import './styles/production.css'
+// import './styles/production.css'
 import  ProductionTable from './components/ProductionTable'
 import dayjs from 'dayjs'
 
-import { Input, Typography, Button } from 'antd'
+import { Input, Typography, Button, Col, Row, Card, notification } from 'antd'
 
 import firebaseApp from "../../firebase-config"
 import { getFirestore, doc, setDoc, Timestamp } from 'firebase/firestore'
@@ -13,58 +13,62 @@ const {Title} = Typography
 
 const Production = () => {
 
-    const [frijol, setFrijol] = useState(0)
-    const [frijolElote, setFrijolElote] = useState(0)
-    const [total, setTotal] = useState(0)
-    const [isAdmin, setIsAdmin] = useState(localStorage.getItem('isAdmin'))
+    const [stockInicialFrijol, setStockInicialFrijol] = useState(0)
+    const [stockInicialFrijolElote, setStockInicialFrijolElote] = useState(0)
+    const [isAdmin] = useState(localStorage.getItem('UID'))
 
     const handleInsertProduction = async () => {
         const date = dayjs().format('DD-MM-YYYY')
         const docRef = doc(db, 'produccion', date)
 
-        setDoc(docRef, {
-            frijol,
-            frijolElote,
-            total,
-            fecha: Timestamp.fromDate(new Date())
-        })
+        try {
+            await setDoc(docRef, {
+                fechaStock: Timestamp.fromDate(new Date()),
+                stockInicialFrijol,
+                stockFrijol: 0,
+                entregasFrijol: 0,
+                devolucionesFrijol: 0,
+                stockInicialFrijolElote,
+                stockFrijolElote: 0,
+                entregasFrijolElote: 0,
+                devolucionesFrijolElote: 0
+            })
+
+            notification.success({
+                message: `Registro de produccion agregado correctamente`
+            })
+        } catch (err) {
+            notification.error({
+                message: 'Error al agregar registro de produccion',
+                description: `${err}`
+            })
+        }
     }
-
-    const calculateTotal = () => {
-        if(frijol === '') setFrijol(0)
-        if(frijolElote === '') setFrijolElote(0)
-
-        setTotal(parseInt(frijol)+parseInt(frijolElote))
-    }
-
-    useEffect(() => {
-        calculateTotal()
-        
-    }, [frijol, frijolElote])
 
     return (
         <>
             <Title>Produccion</Title>
 
-            <div className='productionContainer'>
-                
-                <div className='insertProduction'>
+            <Row>
+                <Col md={6} span={24}>
+                    <Card
+                        title = 'Agregar datos de produccion'
+                        bordered='true'
+                        headStyle={{ backgroundColor: '#383c44', color: '#fff', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}
+                    >
+                        <h4>Frijoles sin elote: </h4>
+                        <Input onChange={e => setStockInicialFrijol(e.target.value)}/>
 
-                    <h4>Frijoles sin elote: </h4>
-                    <Input onChange={e => setFrijol(e.target.value)}/>
+                        <h4>Frijoles sin elote:</h4>
+                        <Input onChange={e => setStockInicialFrijolElote(e.target.value)}/>
 
-                    <h4>Frijoles sin elote:</h4>
-                    <Input onChange={e => setFrijolElote(e.target.value)}/>
-
-                    <h4>Total de botes para ruta: {total}</h4>
-
-                    <Button type="primary" onClick={handleInsertProduction}>Registrar</Button>
-                </div>
-
-                { isAdmin && <ProductionTable />}
-
-            </div>
-        
+                        <Button type="primary" onClick={handleInsertProduction}>Registrar</Button>
+                    </Card>
+                </Col>
+                <Col span={24} style={{ paddingTop: '2%' }}>
+                    { isAdmin && <ProductionTable />}
+                </Col>
+            </Row>        
         </>
     )
 }

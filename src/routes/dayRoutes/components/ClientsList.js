@@ -70,7 +70,6 @@ const ClientsList = ({updateTable, day, clientsList}) => {
             <Card 
                 title="Clientes por agregar o quitar"
                 bordered='true'
-                style={{ width: '300px' }}
                 headStyle={{ backgroundColor: '#383c44', color: '#fff', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}
             >
                 <Descriptions bordered size='small' column={2}>

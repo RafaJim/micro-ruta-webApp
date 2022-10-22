@@ -3,7 +3,7 @@ import { utils, writeFile } from 'xlsx'
 import dayjs from 'dayjs'
 import localizedFormat from 'dayjs/plugin/localizedFormat'
 
-import { Table, notification, Col, Row } from 'antd'
+import { Table, notification, Card } from 'antd'
 import { DownloadOutlined } from "@ant-design/icons"
 
 import { TextField } from '@mui/material'
@@ -28,7 +28,7 @@ const ProductionTable = () => {
             const snapDoc = await getDoc(docRef)
             setError(false)
             obj = snapDoc.data()
-            obj.fecha = dayjs.unix(obj.fecha.seconds).format('lll')
+            obj.fechaStock = dayjs.unix(obj.fechaStock.seconds).format('lll')
             setProduction([obj])
 
         } catch(err) {
@@ -64,11 +64,30 @@ const ProductionTable = () => {
     }
 
     const columns = [
-        { title: 'Frijol', dataIndex: 'frijol', key: 'frijol' },
-        { title: 'Frijol Elote', dataIndex: 'frijolElote', key: 'frijolElote' },
-        { title: 'Total', dataIndex: 'total', key: 'total' },
-        { title: 'Fecha', dataIndex: 'fecha', key: 'fecha' }
+        { title: 'Fecha', dataIndex: 'fechaStock', key: 'fechaStock' },
+        { title: 'Stock inicial frijol', dataIndex: 'stockInicialFrijol', key: 'stockInicialFrijol' },
+        { title: 'Stock frijol', dataIndex: 'stockFrijol', key: 'stockFrijol' },
+        { title: 'Entregas frijol', dataIndex: 'entregasFrijol', key: 'entregasFrijol' },
+        { title: 'Devoluciones frijol', dataIndex: 'devolucionesFrijol', key: 'devolucionesFrijol' },
+        { title: 'Stock inicial frijol c/Elote', dataIndex: 'stockInicialFrijolElote', key: 'stockInicialFrijolElote' },
+        { title: 'Stock frijol c/Elote', dataIndex: 'stockFrijolElote', key: 'stockFrijolElote' },
+        { title: 'Entregas frijol c/Elote', dataIndex: 'entregasFrijolElote', key: 'entregasFrijolElote' },
+        { title: 'Devoluciones frijol c/Elote', dataIndex: 'devolucionesFrijolElote', key: 'devolucionesFrijolElote' },
     ]
+
+    const titleContent = (
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <TextField
+                type="date"
+                label="Fecha"
+                variant="standard" 
+                onChange={e => handleDateChange(e.target.value)} 
+                defaultValue={dayjs().format('YYYY-MM-DD')} 
+                sx={{ input:{ color: '#fff' } }}
+            />
+            <DownloadOutlined onClick={handleExport} style={{ fontSize: 30, color: '#fff' }} />
+        </div>
+    )
 
     useEffect(() => {
         getData()
@@ -76,30 +95,21 @@ const ProductionTable = () => {
     }, [date])
 
     return (
-        <div style={{width: '500px', alignItems: 'center'}}>
-            <Row justify="space-between" style={{ padding: 10, borderTopLeftRadius: '10px', borderTopRightRadius: '10px', backgroundColor: '#383c44' }}>
-                <Col>
-                    <TextField
-                        type="date"
-                        label="Fecha"
-                        variant="standard" 
-                        onChange={e => handleDateChange(e.target.value)} 
-                        defaultValue={dayjs().format('YYYY-MM-DD')} 
-                        sx={{ input:{ color: '#fff' } }}
-                    />
-                </Col>
-                <Col>
-                    <DownloadOutlined onClick={handleExport} style={{ fontSize: 30, color: '#fff' }} />
-                </Col>
-            </Row>
-            
-            <Table
-                columns={columns}
-                dataSource={production}
-                pagination={false}
-                style={{border: 'groove'}}
-            />
-        </div>
+        <>
+            <Card
+                title = {titleContent}
+                bordered='true'
+                headStyle={{ backgroundColor: '#383c44', color: '#fff', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}
+            >
+                <Table
+                    columns={columns}
+                    dataSource={production}
+                    pagination={false}
+                    scroll={{ x: 1 }}
+                    bordered
+                />
+            </Card>
+        </>
     )
 }
  

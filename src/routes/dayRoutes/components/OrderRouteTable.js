@@ -111,7 +111,6 @@ const OrderRouteTable = ({updateTable, day, dataSource}) => {
             <Card 
                 title="Clientes dentro de la ruta"
                 bordered='true'
-                style={{ width: '500px' }}
                 headStyle={{ backgroundColor: '#383c44', color: '#fff', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}
             >
                 <Table

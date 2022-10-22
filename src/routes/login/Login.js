@@ -6,7 +6,7 @@ import logo from './logo.png'
 import firebaseApp from '../../firebase-config'
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 
-import { Input, Button } from 'antd'
+import { Input, Button, Modal } from 'antd'
 import { UserOutlined,
         EyeInvisibleOutlined,
         EyeTwoTone,
@@ -24,21 +24,40 @@ const Login = ({authen}) => {
 
     const navigate = useNavigate()
 
-    const handleSignIn = () => {
-        signInWithEmailAndPassword(auth, email, pass)
-        .then((result) => {
-            const userUID = result.user.uid
-            const token = result.user.accessToken
+    const handleSignIn = async() => {
+        if(email === 'ruta@micro.com') {
+            return errorUnAuth()
+        }
+
+        try {
+            const login = await signInWithEmailAndPassword(auth, email, pass)
+            const userUID = login.user.uid
+            const token = login.user.accessToken
             localStorage.setItem("token", token)
-            if(userUID === 'pj11HPPJyKUnx2gZ3Gm8f7dq9q82') localStorage.setItem("isAdmin", "true")
-            else localStorage.setItem("isAdmin", "")
+            if(userUID === 'pj11HPPJyKUnx2gZ3Gm8f7dq9q82') localStorage.setItem("UID", "pj11HPPJyKUnx2gZ3Gm8f7dq9q82")
             authen()
-        })
-        .then(() => navigate('/Dashboard') )        
+            navigate('/Dashboard')
+        }catch(err) {
+            errorLogin()
+        }    
     }
 
     const redirect = () => {
         localStorage.getItem('token') && navigate('/Dashboard')
+    }
+
+    const errorLogin = () => {
+        Modal.error({
+            title: 'Error al iniciar sesion',
+            content: 'Correo o contraseña incorrectas'
+        })
+    }
+
+    const errorUnAuth = () => {
+        Modal.error({
+            title: 'Error al iniciar sesion',
+            content: 'Esta cuenta no tiene acceso.',
+        })
     }
 
     useEffect(() => {

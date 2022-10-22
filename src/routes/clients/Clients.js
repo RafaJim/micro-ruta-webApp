@@ -2,11 +2,7 @@ import { useEffect, useState } from "react"
 import EditClientDrawer from "./components/EditClientDrawer"
 import NewClientDrawer from "./components/NewClientDrawer"
 
-import Box from '@mui/material/Box'
-import Container from '@mui/material/Container'
-import Grid from '@mui/material/Grid'
-
-import { Row, Typography, Table, Popconfirm, Space, Button } from 'antd'
+import { Row, Typography, Table, Popconfirm, Space, Button, Col, Card } from 'antd'
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons"
 
 import firebaseApp from "../../firebase-config"
@@ -78,6 +74,12 @@ const Clients = () => {
             </Space>
         }
     ]
+
+    const titleContent = (
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Button onClick={() => setOpenNew(true)} type="primary" icon={<PlusOutlined />} style={{ backgroundColor: 'green', borderColor: "green" }} >Cliente</Button>
+        </div>
+    )
     
     useEffect(() => {
         getClients()
@@ -85,30 +87,28 @@ const Clients = () => {
 
     return (
         <>
-        <Title>Clientes</Title>
-            <Container style={{ width: '100%', borderRadius: '15px' }}>
-            
-                <Row justify="space-between" style={{ padding: 10, borderTopLeftRadius: '10px', borderTopRightRadius: '10px', backgroundColor: '#383c44' }}>
-                    <Button onClick={() => setOpenNew(true)} type="primary" icon={<PlusOutlined />} style={{ backgroundColor: 'green', borderColor: "green" }} >Cliente</Button>
-                </Row>
+            <Title>Clientes</Title>
 
-                <Box sx={{ display: 'flex', borderStyle: 'groove', backgroundColor: '#fff' }}>
-                    <Grid container >
-                        <Grid item xs={12}>
-                            <Table
-                                columns={columns}
-                                dataSource={clients}
-                                pagination={false}
-                                scroll={{ x: 1 }}
-                                // bordered
-                            />
-                        </Grid>
-                    </Grid>
-                </Box>
+            <Row>
+                <Col span={24}>
+                    <Card
+                        title = {titleContent}
+                        bordered='true'
+                        headStyle={{ backgroundColor: '#383c44', color: '#fff', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}
+                    >
+                        <Table
+                            columns={columns}
+                            dataSource={clients}
+                            pagination={false}
+                            scroll={{ x: 1 }}
+                            bordered
+                        />
+                    </Card>
+                </Col>
+            </Row>
 
-                <EditClientDrawer dataSource={clientData} open={open} openClose={handleOpenCloseDrawer} getData={getClients} />
-                <NewClientDrawer open={openNew} openClose={handleOpenCloseDrawer} getData={getClients} />
-        </Container>
+            <EditClientDrawer dataSource={clientData} open={open} openClose={handleOpenCloseDrawer} getData={getClients} />
+            <NewClientDrawer open={openNew} openClose={handleOpenCloseDrawer} getData={getClients} />
         </>
     )
 }

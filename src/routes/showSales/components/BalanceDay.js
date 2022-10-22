@@ -28,6 +28,7 @@ const BalanceDay = ({fechaDoc, error}) => {
             onSnapshot(docRef, (doc) => {
                 try {
                     obj = doc.data()
+                    res = []
                     res.push({
                         id: id,
                         totalVendidoFrijol: obj.totalVendidoFrijol,
@@ -79,6 +80,12 @@ const BalanceDay = ({fechaDoc, error}) => {
         { field: 'totalVendido', headerName: 'Total vendido', width: 120, headerAlign: 'center' }
     ]
 
+    const extra = (
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <DownloadOutlined onClick={() => handleExport('Corte_', balanceDay)} style={{ fontSize: 30, color: '#fff' }}/>
+        </div>
+    )
+        
     useEffect(() => {
         getData()
     }, [fechaDoc])
@@ -88,9 +95,8 @@ const BalanceDay = ({fechaDoc, error}) => {
             <Card
                 title="Corte del dia"
                 bordered='true'
-                style={{ width: '420px' }}
                 headStyle={{ backgroundColor: '#383c44', color: '#fff', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}
-                extra={<DownloadOutlined onClick={() => handleExport('Corte_', balanceDay)} style={{ fontSize: 30, color: '#fff' }} />}
+                extra={extra}
             >
                 <DataGrid
                     rows={balanceDay}

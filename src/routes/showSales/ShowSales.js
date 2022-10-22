@@ -8,9 +8,6 @@ import localizedFormat from 'dayjs/plugin/localizedFormat'
 
 import { DataGrid } from '@mui/x-data-grid'
 import TextField from "@mui/material/TextField"
-import Box from '@mui/material/Box'
-import Container from '@mui/material/Container'
-import Grid from '@mui/material/Grid'
 
 import { notification, Col, Row, Typography, Card } from 'antd'
 import {
@@ -41,7 +38,7 @@ const ShowSales = () => {
         let id = 0
 
         if(fechaDoc === dayjs().format('DD-MM-YYYY')) {
-            await onSnapshot(docRef, (doc) => {
+            onSnapshot(docRef, (doc) => {
                 obj = doc.data()
                 try {
                     arrAux = Object.values(obj)
@@ -53,9 +50,11 @@ const ShowSales = () => {
                     })
                     return
                 }
-                
                 setError(false)
                 
+                res = []
+                resInventory = []
+
                 arrAux.map((item) => {
                     res.push({
                         id: id,
@@ -69,12 +68,24 @@ const ShowSales = () => {
                         totalFrijolElote: item.totalFrijolElote,
                         total: item.total,
                         efectivoRecibido: item.efectivoRecibido,
-                        cambio: item.cambio,
+                        cambio: item.cambio
                     })
+
+                    resInventory.push({
+                        id: id,
+                        cliente: item.cliente,
+                        lunes: item.inventarioDia['lunes'],
+                        martes: item.inventarioDia['martes'],
+                        miercoles: item.inventarioDia['miercoles'],
+                        jueves: item.inventarioDia['jueves'],
+                        viernes: item.inventarioDia['viernes']
+                    })
+
                     id++
                     return null
                 })
                 setSales(res)
+                setInventoryDay(resInventory)
             })
         } else {
            await getDoc(docRef)
@@ -96,11 +107,12 @@ const ShowSales = () => {
                         totalFrijolElote: item.totalFrijolElote,
                         total: item.total,
                         efectivoRecibido: item.efectivoRecibido,
-                        cambio: item.cambio,
+                        cambio: item.cambio
                     })
 
                     resInventory.push({
                         id: id,
+                        cliente: item.cliente,
                         lunes: item.inventarioDia['lunes'],
                         martes: item.inventarioDia['martes'],
                         miercoles: item.inventarioDia['miercoles'],
@@ -162,12 +174,27 @@ const ShowSales = () => {
     ]
 
     const columnsInventory = [
+        { field: 'cliente', headerName: 'Cliente', width: 120, headerAlign: 'center' },
         { field: 'lunes', headerName: 'Lunes', width: 90, headerAlign: 'center' },
         { field: 'martes', headerName: 'Martes', width: 90, headerAlign: 'center' },
         { field: 'miercoles', headerName: 'Miercoles', width: 90, headerAlign: 'center' },
         { field: 'jueves', headerName: 'Jueves', width: 90, headerAlign: 'center' },
         { field: 'viernes', headerName: 'Viernes', width: 90, headerAlign: 'center' },
     ]
+
+    const titleContent = (
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <TextField 
+                type='date' 
+                label="Fecha" 
+                variant="standard" 
+                defaultValue={dayjs().format('YYYY-MM-DD')} 
+                onChange={ e => handleDateChange(e.target.value) } 
+                sx={{ input:{ color: '#fff' } }} 
+            />
+            <DownloadOutlined onClick={() => handleExport('Frijoles_', sales)} style={{ fontSize: 30, color: '#fff' }}/>
+        </div>
+    )
 
     useEffect(() => {
         getData()
@@ -176,27 +203,14 @@ const ShowSales = () => {
     
     return (
         <>
-        <Title>Ventas del dia</Title>
-            <Container style={{ width: '100%', borderRadius: '15px' }}>
-            
-                <Row justify="space-between" style={{ padding: 10, borderTopLeftRadius: '10px', borderTopRightRadius: '10px', backgroundColor: '#383c44' }}>
-                    <Col>
-                        <TextField 
-                            type='date' 
-                            label="Fecha" 
-                            variant="standard" 
-                            defaultValue={dayjs().format('YYYY-MM-DD')} 
-                            onChange={ e => handleDateChange(e.target.value) } 
-                            sx={{ input:{ color: '#fff' } }} />
-                    </Col>
-                    <Col>
-                        <DownloadOutlined onClick={() => handleExport('Frijoles_', sales)} style={{ fontSize: 30, color: '#fff' }} />
-                    </Col>
-                </Row>
-
-            <Box sx={{ display: 'flex', borderStyle: 'groove', backgroundColor: '#fff' }}>
-                <Grid container >
-                    <Grid item xs={12}>
+            <Title>Ventas del dia</Title>
+            <Row>
+                <Col span={24} >
+                    <Card
+                        title = {titleContent}
+                        bordered='true'
+                        headStyle={{ backgroundColor: '#383c44', color: '#fff', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}
+                    >
                         <DataGrid
                             rows={sales}
                             columns={columns}
@@ -206,31 +220,34 @@ const ShowSales = () => {
                             autoHeight={true}
                             sx={{ '& .MuiDataGrid-cell--textCenter': { align:"center" } }}
                         />
-                    </Grid>
-                </Grid>
-            </Box>
+                    </Card>
+                </Col>
+            </Row>
 
-            <Card
-                title="Inventario de etiquetas"
-                bordered='true'
-                style={{ width: '510px' }}
-                headStyle={{ backgroundColor: '#383c44', color: '#fff', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}
-                extra={<DownloadOutlined onClick={() => handleExport('Inventario_', inventoryDay)} style={{ fontSize: 30, color: '#fff' }} />}
-            >
-                <DataGrid
-                    rows={inventoryDay}
-                    columns={columnsInventory}
-                    pageSize={7}
-                    rowsPerPageOptions={[7]}
-                    disableSelectionOnClick
-                    autoHeight={true}
-                    sx={{ '& .MuiDataGrid-cell--textCenter': { align:"center" } }}
-                />
-            </Card>
+            <Row style={{ justifyContent: 'space-between' }}>
+                <Col md={11} style={{ marginTop: '1.5%', marginBottom: '1.5%' }}>
+                    <Card
+                        title="Inventario de etiquetas"
+                        bordered='true'
+                        headStyle={{ backgroundColor: '#383c44', color: '#fff', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}
+                        extra={<DownloadOutlined onClick={() => handleExport('Inventario_', inventoryDay)} style={{ fontSize: 30, color: '#fff' }} />}
+                    >
+                        <DataGrid
+                            rows={inventoryDay}
+                            columns={columnsInventory}
+                            pageSize={7}
+                            rowsPerPageOptions={[7]}
+                            disableSelectionOnClick
+                            autoHeight={true}
+                            // sx={{ '& .MuiDataGrid-cell--textCenter': { align:"center" } }}
+                        />
+                    </Card>
+                </Col>
 
-            <BalanceDay fechaDoc={fechaDoc} error={error} />
-
-        </Container>
+                <Col md={11} style={{ marginTop: '1.5%', marginBottom: '1.5%' }}>
+                    <BalanceDay fechaDoc={fechaDoc} error={error} />
+                </Col>
+            </Row>
         </>
     )
 }

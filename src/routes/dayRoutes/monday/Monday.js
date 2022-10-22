@@ -3,7 +3,7 @@ import useUpdateTable from "../components/useUpdateTable"
 import ClientsList from '../components/ClientsList'
 import OrderRouteTable from '../components/OrderRouteTable'
 
-import { Typography } from "antd"
+import { Typography, Col, Row } from "antd"
 
 import firebaseApp from "../../../firebase-config"
 import { getFirestore, collection, getDocs } from 'firebase/firestore'
@@ -67,10 +67,14 @@ const Monday = () => {
         <>
             <Title>Lunes</Title>
 
-            <div style={{ display: 'flex', alignContent: 'space-between', justifyContent: 'center' }}>
-                <ClientsList updateTable={getClientsOrder} day={'Lunes'} clientsList={clientsList} />
-                <OrderRouteTable updateTable={getClientsOrder} day={'Lunes'} dataSource={clientsOrder} />
-            </div>
+            <Row style={{ justifyContent: 'space-between' }}>
+                <Col md={11}>
+                    <ClientsList updateTable={getClientsOrder} day={'Lunes'} clientsList={clientsList} />
+                </Col>
+                <Col md={11}>
+                    <OrderRouteTable updateTable={getClientsOrder} day={'Lunes'} dataSource={clientsOrder} />
+                </Col>
+            </Row>
         </>
     )
 }

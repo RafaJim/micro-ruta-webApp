@@ -3,7 +3,7 @@ import { utils, writeFile } from 'xlsx'
 import dayjs from 'dayjs'
 import localizedFormat from 'dayjs/plugin/localizedFormat'
 
-import { Table, notification, Col, Row } from 'antd'
+import { Table, notification, Card } from 'antd'
 import { DownloadOutlined } from "@ant-design/icons"
 
 import { TextField } from '@mui/material'
@@ -70,36 +70,41 @@ const ProductionTable = () => {
         { title: 'KM Recorridos', dataIndex: 'kmRecorrido', key: 'kmRecorrido' }
     ]
 
+    const titleContent = (
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <TextField
+                type="date"
+                label="Fecha"
+                variant="standard" 
+                onChange={e => handleDateChange(e.target.value)} 
+                defaultValue={dayjs().format('YYYY-MM-DD')} 
+                sx={{ input:{ color: '#fff' } }}
+            />
+            <DownloadOutlined onClick={handleExport} style={{ fontSize: 30, color: '#fff' }} />
+        </div>
+    )
+
     useEffect(() => {
         getData()
         setError(false)
     }, [date])
 
     return (
-        <div style={{width: '500px', alignItems: 'center'}}>
-            <Row justify="space-between" style={{ padding: 10, borderTopLeftRadius: '10px', borderTopRightRadius: '10px', backgroundColor: '#383c44' }}>
-                <Col>
-                    <TextField
-                        type="date"
-                        label="Fecha"
-                        variant="standard" 
-                        onChange={e => handleDateChange(e.target.value)} 
-                        defaultValue={dayjs().format('YYYY-MM-DD')} 
-                        sx={{ input:{ color: '#fff' } }}
-                    />
-                </Col>
-                <Col>
-                    <DownloadOutlined onClick={handleExport} style={{ fontSize: 30, color: '#fff' }} />
-                </Col>
-            </Row>
-            
-            <Table
-                columns={columns}
-                dataSource={production}
-                pagination={false}
-                style={{border: 'groove'}}
-            />
-        </div>
+        <>
+            <Card
+                title = {titleContent}
+                bordered='true'
+                headStyle={{ backgroundColor: '#383c44', color: '#fff', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}
+            >
+                <Table
+                    columns={columns}
+                    dataSource={production}
+                    pagination={false}
+                    scroll={{ x: 1 }}
+                    bordered
+                />
+            </Card>
+        </>
     )
 }
  
