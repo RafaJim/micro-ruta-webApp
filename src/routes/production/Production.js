@@ -24,11 +24,11 @@ const Production = () => {
         try {
             await setDoc(docRef, {
                 fechaStock: Timestamp.fromDate(new Date()),
-                stockInicialFrijol,
+                stockInicialFrijol: parseInt(stockInicialFrijol),
                 stockFrijol: 0,
                 entregasFrijol: 0,
                 devolucionesFrijol: 0,
-                stockInicialFrijolElote,
+                stockInicialFrijolElote: parseInt(stockInicialFrijolElote),
                 stockFrijolElote: 0,
                 entregasFrijolElote: 0,
                 devolucionesFrijolElote: 0
@@ -56,10 +56,10 @@ const Production = () => {
                         bordered='true'
                         headStyle={{ backgroundColor: '#383c44', color: '#fff', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}
                     >
-                        <h4>Frijoles sin elote: </h4>
+                        <h4>Frijoles: </h4>
                         <Input onChange={e => setStockInicialFrijol(e.target.value)}/>
 
-                        <h4>Frijoles sin elote:</h4>
+                        <h4>Frijoles con elote:</h4>
                         <Input onChange={e => setStockInicialFrijolElote(e.target.value)}/>
 
                         <Button type="primary" onClick={handleInsertProduction}>Registrar</Button>
