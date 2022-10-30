@@ -25,11 +25,11 @@ const Production = () => {
             await setDoc(docRef, {
                 fechaStock: Timestamp.fromDate(new Date()),
                 stockInicialFrijol: parseInt(stockInicialFrijol),
-                stockFrijol: 0,
+                stockFrijol: parseInt(stockInicialFrijol),
                 entregasFrijol: 0,
                 devolucionesFrijol: 0,
                 stockInicialFrijolElote: parseInt(stockInicialFrijolElote),
-                stockFrijolElote: 0,
+                stockFrijolElote: parseInt(stockInicialFrijolElote),
                 entregasFrijolElote: 0,
                 devolucionesFrijolElote: 0
             })
