@@ -25,7 +25,7 @@ const Login = ({authen}) => {
     const navigate = useNavigate()
 
     const handleSignIn = async() => {
-        if(email === 'ruta@micro.com') {
+        if(email === 'ventas.tlaquepaque8@gmail.com') {
             return errorUnAuth()
         }
 
@@ -34,7 +34,25 @@ const Login = ({authen}) => {
             const userUID = login.user.uid
             const token = login.user.accessToken
             localStorage.setItem("token", token)
-            if(userUID === 'pj11HPPJyKUnx2gZ3Gm8f7dq9q82') localStorage.setItem("UID", "pj11HPPJyKUnx2gZ3Gm8f7dq9q82")
+            
+            switch(userUID) {
+                case 'pj11HPPJyKUnx2gZ3Gm8f7dq9q82':    //test
+                    localStorage.setItem("UID", "pj11HPPJyKUnx2gZ3Gm8f7dq9q82")
+                    break
+                
+                case 'tcsZ7owzemcuGJozXu9M4t5e8o43':    //mag
+                    localStorage.setItem("UID", "tcsZ7owzemcuGJozXu9M4t5e8o43")
+                    break
+
+                case '10dozg0IdndjpTe9E1xMMyLcdvm1':    //rob
+                    localStorage.setItem("UID", "10dozg0IdndjpTe9E1xMMyLcdvm1")
+                    break
+
+                case 'N9IFKiyhe9gd61LqRfRxoLBwZJy1':    //efi
+                    localStorage.setItem("UID", "N9IFKiyhe9gd61LqRfRxoLBwZJy1")
+                    break
+            }
+            
             authen()
             navigate('/Dashboard')
         }catch(err) {
