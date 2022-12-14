@@ -44,6 +44,7 @@ const Friday = () => {
                 longitud: item.localizacion.longitude,
                 entregable: false,
                 ordenEntrega: -1,
+                Estatus: "NC",
                 checked: false
             })
             id++
