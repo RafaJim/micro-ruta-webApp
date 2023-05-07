@@ -8,8 +8,9 @@ import localizedFormat from 'dayjs/plugin/localizedFormat'
 
 import { DataGrid } from '@mui/x-data-grid'
 import TextField from "@mui/material/TextField"
+import CommentIcon from '@mui/icons-material/Comment';
 
-import { notification, Col, Row, Typography, Card } from 'antd'
+import { notification, Col, Row, Typography, Card, Modal } from 'antd'
 import {
     DownloadOutlined
   } from "@ant-design/icons"
@@ -24,20 +25,35 @@ const ShowSales = () => {
     const db = getFirestore(firebaseApp)
 
     const [sales, setSales] = useState(data)
+    const [specialSales, setSpecialSales] = useState(data)
     const [inventoryDay, setInventoryDay] = useState(data)
     const [fechaDoc, setFechaDoc] = useState(dayjs().format('DD-MM-YYYY'))
     const [error, setError] = useState(false)
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [comment, setComment] = useState('')
+
+    const handleOk = () => {
+        setIsModalOpen(false)
+    }
+
+    const handleCancel = () => {
+        setIsModalOpen(false)
+    }
     
     const getData = async () => {
         const docRef = doc(db, 'ventas', fechaDoc)
+        const docRefSpec = doc(db, 'ventasEspeciales', fechaDoc)
         dayjs.extend(localizedFormat)
         let obj = {}
+        let objEspec = {}
         let arrAux = []
         let res = []
+        let resEspec = []
         let resInventory = []
         let id = 0
 
         if(fechaDoc === dayjs().format('DD-MM-YYYY')) {
+            //VENTAS NORMALES
             onSnapshot(docRef, (doc) => {
                 obj = doc.data()
                 try {
@@ -45,7 +61,7 @@ const ShowSales = () => {
                 } catch (err) {
                     setError(true)
                     notification.error({
-                        message: "No se pudo obtener datos",
+                        message: "No se pudo obtener datos {hoy normal}",
                         description: 'Esto debido a que no hay registros del dia de hoy'
                     })
                     return
@@ -58,8 +74,9 @@ const ShowSales = () => {
                 arrAux.map((item) => {
                     res.push({
                         id: id,
+                        comentario: item.comentario,
                         cliente: item.cliente,
-                        fecha: dayjs.unix(item.fecha.seconds).format('lll'),
+                        fecha: dayjs.unix(item.fecha.seconds).format('hh:mm:ss A'),
                         frijolesEntrega: item.frijolesEntrega,
                         frijolesDevolucion: item.frijolesDevolucion,
                         frijolesEloteEntrega: item.frijolesEloteEntrega,
@@ -87,7 +104,51 @@ const ShowSales = () => {
                 setSales(res)
                 setInventoryDay(resInventory)
             })
+
+            //VENTAS ESPECIALES
+            onSnapshot(docRefSpec, docSpec => {
+                objEspec = docSpec.data()
+                try {
+                    arrAux = Object.values(objEspec)
+                } catch (err) {
+                    setError(true)
+                    notification.error({
+                        message: "No se pudo obtener datos {hoy especial}",
+                        description: 'Esto debido a que no hay registros del dia de hoy'
+                    })
+                    return
+                }
+                setError(false)
+                
+                resEspec = []
+                resInventory = []
+
+                arrAux.map((item) => {
+                    resEspec.push({
+                        id: id,
+                        comentario: item.comentario,
+                        alias: item.alias,
+                        fecha: dayjs.unix(item.fecha.seconds).format('hh:mm:ss A'),
+                        frijolesEntrega: item.frijolesEntrega,
+                        frijolesDevolucion: item.frijolesDevolucion,
+                        frijolesEloteEntrega: item.frijolesEloteEntrega,
+                        frijolesEloteDevolucion: item.frijolesEloteDevolucion,
+                        totalFrijol: item.totalFrijol,
+                        totalFrijolElote: item.totalFrijolElote,
+                        total: item.total,
+                        efectivoRecibido: item.efectivoRecibido,
+                        cambio: item.cambio
+                    })
+
+                    id++
+                    return null
+                })
+                setSpecialSales(resEspec)
+                // inventoryDay.push(resInventory)
+                // setInventoryDay(resInventory)
+            })
         } else {
+            //VENTA NORMAL
            await getDoc(docRef)
             .then((snapshot) => {
                 obj = snapshot.data()
@@ -97,8 +158,9 @@ const ShowSales = () => {
                 arrAux.map((item) => {
                     res.push({
                         id: id,
+                        comentario: item.comentario,
                         cliente: item.cliente,
-                        fecha: dayjs.unix(item.fecha.seconds).format('lll'),
+                        fecha: dayjs.unix(item.fecha.seconds).format('hh:mm:ss A'),
                         frijolesEntrega: item.frijoles,
                         frijolesDevolucion: item.frijolesDevolucion,
                         frijolesEloteEntrega: item.frijolesEloteEntrega,
@@ -127,11 +189,53 @@ const ShowSales = () => {
                 setInventoryDay(resInventory)
             })
             .catch(err => {
-                setSales({})
+                setSales([])
+                setInventoryDay([])
+                setError(true)
+                notification.error({
+                    message: 'Error al obtener informacion {fecha normal}',
+                    description: `No existen datos para la fecha ${fechaDoc}`
+                })
+            })
+
+            //VENTAS ESPECIAL
+            await getDoc(docRefSpec)
+            .then((snapshot) => {
+                objEspec = snapshot.data() || {}
+                arrAux = Object.values(objEspec)
+                setError(false)
+
+
+                arrAux.map((item) => {
+                    resEspec.push({
+                        id: id,
+                        comentario: item.comentario,
+                        cliente: item.cliente,
+                        fecha: dayjs.unix(item.fecha.seconds).format('hh:mm:ss A'),
+                        frijolesEntrega: item.frijolesEntrega,
+                        frijolesDevolucion: item.frijolesDevolucion,
+                        frijolesEloteEntrega: item.frijolesEloteEntrega,
+                        frijolesEloteDevolucion: item.frijolesEloteDevolucion,
+                        totalFrijol: item.totalFrijol,
+                        totalFrijolElote: item.totalFrijolElote,
+                        total: item.total,
+                        efectivoRecibido: item.efectivoRecibido,
+                        cambio: item.cambio
+                    })
+
+                    id++
+                    return null
+                })
+
+                setSpecialSales(resEspec)
+            })
+            .catch(err => {
+                console.log(err)
+                setSales([])
                 setInventoryDay({})
                 setError(true)
                 notification.error({
-                    message: 'Error al obtener informacion',
+                    message: 'Error al obtener informacion {fecha especial}',
                     description: `No existen datos para la fecha ${fechaDoc}`
                 })
             })
@@ -159,18 +263,45 @@ const ShowSales = () => {
         writeFile(wb, docName + fechaDoc + ".xlsx")
     }
 
+    const openComment = (comment) => {
+        setComment(comment)
+        setIsModalOpen(true)
+    }
+
     const columns = [
-        { field: 'cliente', headerName: 'Cliente', width: 120, headerAlign: 'center' },
-        { field: 'fecha', headerName: 'Fecha venta', width: 180, headerAlign: 'center' },
+        { field: 'comentarios', headerName: 'Comentarios', sortable: 'false', width: 80, headerAlign: 'center', renderCell: (params) => {
+            return (
+                params.row.comentario ? <CommentIcon onClick={() => openComment(params.row.comentario)} style={{ cursor: "pointer" }}/>:null
+            )
+          } },
+        { field: 'cliente', headerName: 'Cliente', width: 170, headerAlign: 'center' },
+        { field: 'fecha', headerName: 'Fecha venta', width: 150, headerAlign: 'center' },
         { field: 'frijolesEntrega', headerName: 'Frijoles', width: 70, headerAlign: 'center' },
         { field: 'frijolesDevolucion', headerName: 'Frijoles devueltos', width: 130, headerAlign: 'center' },
         { field: 'frijolesEloteEntrega', headerName: 'Frijoles con elote', width: 130, headerAlign: 'center' },
         { field: 'frijolesEloteDevolucion', headerName: 'Frijoles con elote devueltos', width: 190, headerAlign: 'center' },
-        { field: 'totalFrijol', headerName: 'Total frijol', width: 80, headerAlign: 'center' },
-        { field: 'totalFrijolElote', headerName: 'Total frijol con elote', width: 150, headerAlign: 'center' },
-        { field: 'total', headerName: 'Total de la venta', width: 120, headerAlign: 'center' },
-        { field: 'efectivoRecibido', headerName: 'Efectivo recibido', width: 120, headerAlign: 'center' },
-        { field: 'cambio', headerName: 'Cambio', width: 70, headerAlign: 'center' },
+        { field: 'totalFrijol', headerName: 'Total frijol ($)', width: 100, headerAlign: 'center' },
+        { field: 'totalFrijolElote', headerName: 'Total frijol con elote ($)', width: 160, headerAlign: 'center' },
+        { field: 'total', headerName: 'Total de la venta ($)', width: 120, headerAlign: 'center' },
+        { field: 'efectivoRecibido', headerName: 'Efectivo recibido ($)', width: 120, headerAlign: 'center' },
+        { field: 'cambio', headerName: 'Cambio ($)', width: 90, headerAlign: 'center' },
+    ]
+
+    const columnsSpecial = [
+        { field: 'comentarios', headerName: 'Comentarios', sortable: 'false', width: 100, headerAlign: 'center', renderCell: (params) => {
+            return (
+                params.row.comentario ? <CommentIcon onClick={() => openComment(params.row.comentario)} style={{ cursor: "pointer" }}/>:null
+            )
+          } },
+        { field: 'alias', headerName: 'Cliente', width: 170, headerAlign: 'center' },
+        { field: 'fecha', headerName: 'Fecha venta', width: 180, headerAlign: 'center' },
+        { field: 'frijolesEntrega', headerName: 'Frijoles', width: 70, headerAlign: 'center' },
+        { field: 'frijolesEloteEntrega', headerName: 'Frijoles con elote', width: 130, headerAlign: 'center' },
+        { field: 'totalFrijol', headerName: 'Total frijol ($)', width: 100, headerAlign: 'center' },
+        { field: 'totalFrijolElote', headerName: 'Total frijol con elote ($)', width: 180, headerAlign: 'center' },
+        { field: 'total', headerName: 'Total de la venta ($)', width: 160, headerAlign: 'center' },
+        { field: 'efectivoRecibido', headerName: 'Efectivo recibido ($)', width: 160, headerAlign: 'center' },
+        { field: 'cambio', headerName: 'Cambio ($)', width: 90, headerAlign: 'center' },
     ]
 
     const columnsInventory = [
@@ -192,7 +323,23 @@ const ShowSales = () => {
                 onChange={ e => handleDateChange(e.target.value) } 
                 sx={{ input:{ color: '#fff' } }} 
             />
+            <h2 style={{ color: '#fff' }}>Venta normal</h2>
             <DownloadOutlined onClick={() => handleExport('Frijoles_', sales)} style={{ fontSize: 30, color: '#fff' }}/>
+        </div>
+    )
+
+    const titleContentSpecials = (
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            {/* <TextField 
+                type='date' 
+                label="Fecha" 
+                variant="standard" 
+                defaultValue={dayjs().format('YYYY-MM-DD')} 
+                onChange={ e => handleDateChange(e.target.value) } 
+                sx={{ input:{ color: '#fff' } }} 
+            /> */}
+            <h2 style={{ color: '#fff' }}>Venta especial</h2>
+            <DownloadOutlined onClick={() => handleExport('VentasEspeciales_', specialSales)} style={{ fontSize: 30, color: '#fff' }}/>
         </div>
     )
 
@@ -204,6 +351,13 @@ const ShowSales = () => {
     return (
         <>
             <Title>Ventas del dia</Title>
+
+            {/* MODAL COMENTARIOS */}
+            <Modal title="Comentario" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+                <p>{comment}</p>
+            </Modal>
+
+            {/* TABLA DE VENTAS */}
             <Row>
                 <Col span={24} >
                     <Card
@@ -214,8 +368,8 @@ const ShowSales = () => {
                         <DataGrid
                             rows={sales}
                             columns={columns}
-                            pageSize={7}
-                            rowsPerPageOptions={[7]}
+                            pageSize={10}
+                            rowsPerPageOptions={[10]}
                             disableSelectionOnClick
                             autoHeight={true}
                             sx={{ '& .MuiDataGrid-cell--textCenter': { align:"center" } }}
@@ -224,6 +378,28 @@ const ShowSales = () => {
                 </Col>
             </Row>
 
+            {/* TABLA DE VENTAS ESPECIALES */}
+            <Row>
+                <Col span={24} style={{ marginTop: '1.5%' }} >
+                    <Card
+                        title = {titleContentSpecials}
+                        bordered='true'
+                        headStyle={{ backgroundColor: '#383c44', color: '#fff', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}
+                    >
+                        <DataGrid
+                            rows={specialSales}
+                            columns={columnsSpecial}
+                            pageSize={10}
+                            rowsPerPageOptions={[10]}
+                            disableSelectionOnClick
+                            autoHeight={true}
+                            sx={{ '& .MuiDataGrid-cell--textCenter': { align:"center" } }}
+                        />
+                    </Card>
+                </Col>
+            </Row>
+
+            {/* TABLA INVENTARIO */}
             <Row style={{ justifyContent: 'space-between' }}>
                 <Col md={11} style={{ marginTop: '1.5%', marginBottom: '1.5%' }}>
                     <Card
@@ -244,6 +420,7 @@ const ShowSales = () => {
                     </Card>
                 </Col>
 
+                {/* TABLA CORTE DEL DIA */}
                 <Col md={11} style={{ marginTop: '1.5%', marginBottom: '1.5%' }}>
                     <BalanceDay fechaDoc={fechaDoc} error={error} />
                 </Col>

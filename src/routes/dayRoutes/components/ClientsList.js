@@ -23,9 +23,11 @@ const ClientsList = ({updateTable, day, clientsList}) => {
                 arrAux.push(
                     client.data()
                 )
+                return null
             })
             arrAux.map(item => {
                 clientsInDay.push(item.nombre)
+                return null
             })
         } catch(err) {
             console.log(err)

@@ -21,6 +21,7 @@ const useUpdateTable = (day) => {
                 arrAux.push(
                     client.data()
                 )
+                return null
             })
 
             arrAux.map(item => {
@@ -29,6 +30,7 @@ const useUpdateTable = (day) => {
                     order: item.ordenEntrega,
                     isDeliveryAvail: item.entregable
                 })
+                return null
             })
         } catch(err) {
             console.log(err)

@@ -75,9 +75,9 @@ const BalanceDay = ({fechaDoc, error}) => {
     }
 
     const columnsBalance = [
-        { field: 'totalVendidoFrijol', headerName: 'Total Frijol', width: 90, headerAlign: 'center' },
-        { field: 'totalVendidoFrijolElote', headerName: 'Total Frijol con elote', width: 150, headerAlign: 'center' },
-        { field: 'totalVendido', headerName: 'Total vendido', width: 120, headerAlign: 'center' }
+        { field: 'totalVendidoFrijol', headerName: 'Total Frijol ($)', width: 120, headerAlign: 'center' },
+        { field: 'totalVendidoFrijolElote', headerName: 'Total Frijol con elote ($)', width: 170, headerAlign: 'center' },
+        { field: 'totalVendido', headerName: 'Total vendido ($)', width: 150, headerAlign: 'center' }
     ]
 
     const extra = (

@@ -32,6 +32,7 @@ const Clients = () => {
                 arrAux.push(
                     client.data()
                 )
+                return null
             })
         } catch(err) {
             console.log(err)
