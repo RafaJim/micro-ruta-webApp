@@ -16,7 +16,7 @@ import {
   } from "@ant-design/icons"
 
 import firebaseApp from "../../firebase-config"
-import { getFirestore, doc, onSnapshot, getDoc } from 'firebase/firestore'
+import { getFirestore, doc, onSnapshot, getDoc, arrayUnion } from 'firebase/firestore'
 
 const { Title } = Typography;
 
@@ -161,7 +161,7 @@ const ShowSales = () => {
                         comentario: item.comentario,
                         cliente: item.cliente,
                         fecha: dayjs.unix(item.fecha.seconds).format('hh:mm:ss A'),
-                        frijolesEntrega: item.frijoles,
+                        frijolesEntrega: item.frijolesEntrega,
                         frijolesDevolucion: item.frijolesDevolucion,
                         frijolesEloteEntrega: item.frijolesEloteEntrega,
                         frijolesEloteDevolucion: item.frijolesEloteDevolucion,
@@ -230,7 +230,6 @@ const ShowSales = () => {
                 setSpecialSales(resEspec)
             })
             .catch(err => {
-                console.log(err)
                 setSales([])
                 setInventoryDay({})
                 setError(true)
