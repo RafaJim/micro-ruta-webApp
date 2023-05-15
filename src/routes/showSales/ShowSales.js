@@ -53,7 +53,7 @@ const ShowSales = () => {
         let id = 0
 
         if(fechaDoc === dayjs().format('DD-MM-YYYY')) {
-            //VENTAS NORMALES
+            //VENTAS NORMALES DEL DIA
             onSnapshot(docRef, (doc) => {
                 obj = doc.data()
                 try {
@@ -105,13 +105,14 @@ const ShowSales = () => {
                 setInventoryDay(resInventory)
             })
 
-            //VENTAS ESPECIALES
+            //VENTAS ESPECIALES DEL DIA
             onSnapshot(docRefSpec, docSpec => {
                 objEspec = docSpec.data()
                 try {
                     arrAux = Object.values(objEspec)
                 } catch (err) {
-                    setError(true)
+                    setSpecialSales([])
+                    // setError(true)
                     notification.error({
                         message: "No se pudo obtener datos {hoy especial}",
                         description: 'Esto debido a que no hay registros del dia de hoy'
@@ -148,7 +149,7 @@ const ShowSales = () => {
                 // setInventoryDay(resInventory)
             })
         } else {
-            //VENTA NORMAL
+            //VENTA NORMAL CUALQUIER DIA
            await getDoc(docRef)
             .then((snapshot) => {
                 obj = snapshot.data()
@@ -198,7 +199,7 @@ const ShowSales = () => {
                 })
             })
 
-            //VENTAS ESPECIAL
+            //VENTAS ESPECIAL CUALQUIER DIA
             await getDoc(docRefSpec)
             .then((snapshot) => {
                 objEspec = snapshot.data() || {}
@@ -230,9 +231,9 @@ const ShowSales = () => {
                 setSpecialSales(resEspec)
             })
             .catch(err => {
-                setSales([])
-                setInventoryDay({})
-                setError(true)
+                setSpecialSales([])
+                setInventoryDay([])
+                // setError(true)
                 notification.error({
                     message: 'Error al obtener informacion {fecha especial}',
                     description: `No existen datos para la fecha ${fechaDoc}`
