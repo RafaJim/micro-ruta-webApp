@@ -1,13 +1,11 @@
 import { useEffect , useState } from "react"
 
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid } from '@mui/x-data-grid';
 import dayjs from "dayjs"
 import { utils, writeFile } from 'xlsx'
 
 import { Card, notification } from 'antd'
-import {
-    DownloadOutlined
-  } from "@ant-design/icons"
+import { DownloadOutlined } from '@ant-design/icons';
 
 import firebaseApp from "../../../firebase-config"
 import { getFirestore, doc, onSnapshot, getDoc } from 'firebase/firestore'

@@ -1,6 +1,7 @@
-import { useEffect , useState } from "react"
-import './styles/showSales.css'
-import BalanceDay from './components/BalanceDay'
+import { useEffect , useState } from 'react';
+import './styles/showSales.css';
+import BalanceDay from './components/BalanceDay';
+import BalanceDayDiffPrice from './components/BalanceDayDiffPrice';
 
 import { utils, writeFile } from 'xlsx'
 import dayjs from 'dayjs'
@@ -74,7 +75,7 @@ const ShowSales = () => {
                 arrAux.map((item) => {
                     res.push({
                         id: id,
-                        comentario: item.comentario,
+                        comentario: item.comentarios,
                         cliente: item.cliente,
                         fecha: dayjs.unix(item.fecha.seconds).format('DD/MM/YYYY'),
                         hora: dayjs.unix(item.fecha.seconds).format('HH:mm:ss'),
@@ -86,7 +87,8 @@ const ShowSales = () => {
                         totalFrijolElote: item.totalFrijolElote,
                         total: item.total,
                         efectivoRecibido: item.efectivoRecibido,
-                        cambio: item.cambio
+                        cambio: item.cambio,
+                        isModify: item.isModify
                     })
 
                     resInventory.push({
@@ -128,7 +130,7 @@ const ShowSales = () => {
                 arrAux.map((item) => {
                     resEspec.push({
                         id: id,
-                        comentario: item.comentario,
+                        comentario: item.comentarios,
                         alias: item.alias,
                         fecha: dayjs.unix(item.fecha.seconds).format('DD/MM/YYYY'),
                         hora: dayjs.unix(item.fecha.seconds).format('HH:mm:ss'),
@@ -140,7 +142,8 @@ const ShowSales = () => {
                         totalFrijolElote: item.totalFrijolElote,
                         total: item.total,
                         efectivoRecibido: item.efectivoRecibido,
-                        cambio: item.cambio
+                        cambio: item.cambio,
+                        isModify: item.isModify
                     })
 
                     id++
@@ -161,7 +164,7 @@ const ShowSales = () => {
                 arrAux.map((item) => {
                     res.push({
                         id: id,
-                        comentario: item.comentario,
+                        comentario: item.comentarios,
                         cliente: item.cliente,
                         fecha: dayjs.unix(item.fecha.seconds).format('DD/MM/YYYY'),
                         hora: dayjs.unix(item.fecha.seconds).format('HH:mm:ss'),
@@ -173,7 +176,8 @@ const ShowSales = () => {
                         totalFrijolElote: item.totalFrijolElote,
                         total: item.total,
                         efectivoRecibido: item.efectivoRecibido,
-                        cambio: item.cambio
+                        cambio: item.cambio,
+                        isModify: item.isModify
                     })
 
                     resInventory.push({
@@ -213,7 +217,7 @@ const ShowSales = () => {
                 arrAux.map((item) => {
                     resEspec.push({
                         id: id,
-                        comentario: item.comentario,
+                        comentario: item.comentarios,
                         cliente: item.cliente,
                         fecha: dayjs.unix(item.fecha.seconds).format('DD/MM/YYYY'),
                         hora: dayjs.unix(item.fecha.seconds).format('HH:mm:ss'),
@@ -225,7 +229,8 @@ const ShowSales = () => {
                         totalFrijolElote: item.totalFrijolElote,
                         total: item.total,
                         efectivoRecibido: item.efectivoRecibido,
-                        cambio: item.cambio
+                        cambio: item.cambio,
+                        isModify: item.isModify
                     })
 
                     id++
@@ -427,8 +432,13 @@ const ShowSales = () => {
                 </Col>
 
                 {/* TABLA CORTE DEL DIA */}
-                <Col md={11} style={{ marginTop: '1.5%', marginBottom: '1.5%' }}>
-                    <BalanceDay fechaDoc={fechaDoc} error={error} />
+                <Col md={12}>
+                    <Col md={24} style={{ marginTop: '3.5%' }}>
+                        <BalanceDay fechaDoc={fechaDoc} error={error} />
+                    </Col>
+                    <Col md={24} style={{ marginTop: '5%'}}>
+                        <BalanceDayDiffPrice data={sales} fechaDoc={fechaDoc} error={error} />
+                    </Col>
                 </Col>
             </Row>
         </>
