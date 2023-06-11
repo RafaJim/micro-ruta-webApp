@@ -1,35 +1,37 @@
-import { useState, useEffect } from 'react'
-import { utils, writeFile } from 'xlsx'
-import dayjs from 'dayjs'
-import localizedFormat from 'dayjs/plugin/localizedFormat'
+import { useState, useEffect, useId } from 'react';
+import { utils, writeFile } from 'xlsx';
+import dayjs from 'dayjs';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
 
-import { Table, notification, Card } from 'antd'
-import { DownloadOutlined } from "@ant-design/icons"
+import { Table, notification, Card } from 'antd';
+import { DownloadOutlined } from "@ant-design/icons";
 
-import { TextField } from '@mui/material'
+import { TextField } from '@mui/material';
 
-import firebaseApp from "../../../firebase-config"
-import { getFirestore, doc, getDoc } from 'firebase/firestore'
+import firebaseApp from "../../../firebase-config";
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
-const db = getFirestore(firebaseApp)
+const db = getFirestore(firebaseApp);
 
 const ProductionTable = () => {
 
-    const [date, setDate] = useState(dayjs().format('DD-MM-YYYY'))
-    const [production, setProduction] = useState([])
-    const [error, setError] = useState(false)
+    const [date, setDate] = useState(dayjs().format('DD-MM-YYYY'));
+    const [production, setProduction] = useState([]);
+    const [error, setError] = useState(false);
+    const fakeId = useId();
 
     const getData = async () => {
-        dayjs.extend(localizedFormat)
-        const docRef = doc(db, 'kilometraje', date)
-        let obj = {}
+        dayjs.extend(localizedFormat);
+        const docRef = doc(db, 'kilometraje', date);
+        let obj = {};
 
         try{
-            const snapDoc = await getDoc(docRef)
-            setError(false)
-            obj = snapDoc.data()
-            obj.fecha = dayjs.unix(obj.fecha.seconds).format('lll')
-            setProduction([obj])
+            const snapDoc = await getDoc(docRef);
+            setError(false);
+            obj = snapDoc.data();
+            obj.fecha = dayjs.unix(obj.fecha.seconds).format('lll');
+            obj.key = fakeId;
+            setProduction([obj]);
 
         } catch(err) {
             setError(true)

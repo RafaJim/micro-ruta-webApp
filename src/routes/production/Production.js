@@ -1,26 +1,46 @@
-import { useState, useEffect } from 'react'
-// import './styles/production.css'
-import  ProductionTable from './components/ProductionTable'
-import dayjs from 'dayjs'
+import { useState, useRef } from 'react';
 
-import { Input, Typography, Button, Col, Row, Card, notification } from 'antd'
+import  ProductionTable from './components/ProductionTable';
+import dayjs from 'dayjs';
 
-import firebaseApp from "../../firebase-config"
-import { getFirestore, doc, setDoc, Timestamp } from 'firebase/firestore'
+import { Input, Typography, Button, Col, Row, Card, notification } from 'antd';
 
-const db = getFirestore(firebaseApp)
-const {Title} = Typography
+import firebaseApp from "../../firebase-config";
+import { getFirestore, doc, setDoc, Timestamp, getDoc, updateDoc } from 'firebase/firestore';
+
+const db = getFirestore(firebaseApp);
+const {Title} = Typography;
 
 const Production = () => {
 
-    const [stockInicialFrijol, setStockInicialFrijol] = useState(0)
-    const [stockInicialFrijolElote, setStockInicialFrijolElote] = useState(0)
-    const [isAdmin] = useState(localStorage.getItem('UID'))
+    const [stockInicialFrijol, setStockInicialFrijol] = useState(0);
+    const [stockInicialFrijolElote, setStockInicialFrijolElote] = useState(0);
+    const [isAdmin] = useState(localStorage.getItem('UID'));
+    const stockInicialFrijolRef = useRef(0);
+    const stockFrijolRef = useRef(0);
+    const stockInicialFrijolEloteRef = useRef(0);
+    const stockFrijolEloteRef = useRef(0);
 
-    const handleInsertProduction = async () => {
-        const date = dayjs().format('DD-MM-YYYY')
-        const docRef = doc(db, 'produccion', date)
+    const checkForDoc = async (docRef) => {
+        try{
+           const snapDoc = await getDoc(docRef);
+           if (!snapDoc.data()) return false;
 
+           if (snapDoc.data()) {
+            const data = snapDoc.data();
+            stockInicialFrijolRef.current = data.stockInicialFrijol;
+            stockFrijolRef.current = data.stockFrijol;
+            stockInicialFrijolEloteRef.current = data.stockInicialFrijolElote;
+            stockFrijolEloteRef.current = data.stockFrijolElote;
+            return true;
+           }
+
+        } catch(err) {
+            console.log(err);
+        }
+    };
+
+    const insertNewDoc = async (docRef) => {
         try {
             await setDoc(docRef, {
                 fechaStock: Timestamp.fromDate(new Date()),
@@ -32,18 +52,48 @@ const Production = () => {
                 stockFrijolElote: parseInt(stockInicialFrijolElote),
                 entregasFrijolElote: 0,
                 devolucionesFrijolElote: 0
-            })
+            });
 
             notification.success({
                 message: `Registro de produccion agregado correctamente`
-            })
+            });
         } catch (err) {
             notification.error({
                 message: 'Error al agregar registro de produccion',
                 description: `${err}`
-            })
+            });
         }
-    }
+    };
+
+    const addIntoDoc = async (docRef) => {
+        try {
+            await updateDoc(docRef, {
+                stockInicialFrijol: (stockInicialFrijolRef.current + parseInt(stockInicialFrijol)),
+                stockFrijol: (stockFrijolRef.current + parseInt(stockInicialFrijol)),
+                stockInicialFrijolElote: (stockInicialFrijolEloteRef.current + parseInt(stockInicialFrijolElote)),
+                stockFrijolElote: (stockFrijolEloteRef.current + parseInt(stockInicialFrijolElote)),
+            });
+
+            notification.success({
+                message: `Actualizacion de stock correcto`
+            });
+        } catch (err) {
+            notification.error({
+                message: 'Error al actualizar stock',
+                description: `${err}`
+            });
+        }
+    };
+
+    const handleInsertProduction = async () => {
+        const date = dayjs().format('DD-MM-YYYY');
+        const docRef = doc(db, 'produccion', date);
+        const docExists = await checkForDoc(docRef);
+
+        docExists ? 
+        addIntoDoc(docRef) :
+        insertNewDoc(docRef);
+    };
 
     return (
         <>
@@ -66,11 +116,11 @@ const Production = () => {
                     </Card>
                 </Col>
                 <Col span={24} style={{ paddingTop: '2%' }}>
-                    { isAdmin && <ProductionTable />}
+                    { isAdmin ? <ProductionTable /> : null}
                 </Col>
             </Row>        
         </>
-    )
+    );
 }
  
 export default Production;
