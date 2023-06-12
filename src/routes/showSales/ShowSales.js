@@ -17,7 +17,7 @@ import {
   } from "@ant-design/icons"
 
 import firebaseApp from "../../firebase-config"
-import { getFirestore, doc, onSnapshot, getDoc, arrayUnion } from 'firebase/firestore'
+import { getFirestore, doc, onSnapshot, getDoc } from 'firebase/firestore'
 
 const { Title } = Typography;
 

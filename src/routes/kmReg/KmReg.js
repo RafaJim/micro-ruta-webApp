@@ -18,11 +18,39 @@ const KmReg = () => {
     const [isAdmin] = useState(localStorage.getItem('UID'));
 
     const handleCheckData = () => {
-        if (kmInit === 0) handleSetFinalKm()
-        else handleSetInitialKm()
+        if (kmInit !== 0 && kmFinal !== 0) handleSetKm();
+        if (kmInit === 0) handleSetFinalKm();
+        if (kmFinal === 0) handleSetInitialKm();
+    }
+
+    const handleSetKm = async () => {
+        const today = dayjs().format('DD-MM-YYYY');
+        const docRef = doc(db, 'kilometraje', today);
+
+        try{
+            await setDoc(docRef, {
+                kmInicial: parseInt(kmInit),
+                kmFinal: parseInt(kmFinal),
+                kmRecorrido: parseInt(kmFinal - kmInit),
+                fecha: Timestamp.fromDate(new Date())
+            })
+
+            notification.success({
+                message: `Registro de KMs agregado correctamente`
+            })
+
+        } catch(err) {
+            notification.error({
+                message: 'Error al agregar registro de KMs',
+                description: `${err}`
+            })
+        }
+        setKmInit(0);
+        setKmFinal(0);
     }
 
     const handleSetInitialKm = async () => {
+        if (kmInit === 0) return;
         const today = dayjs().format('DD-MM-YYYY');
         const docRef = doc(db, 'kilometraje', today);
 
@@ -49,6 +77,7 @@ const KmReg = () => {
     }
 
     const handleSetFinalKm = async () => {
+        if (kmFinal === 0) return;
         const today = dayjs().format('DD-MM-YYYY');
         const docRef = doc(db, 'kilometraje', today);
 
@@ -63,12 +92,12 @@ const KmReg = () => {
             })
 
             notification.success({
-                message: `Registro de KM agregado correctamente`
+                message: `Registro de KM final agregado correctamente`
             })
 
         } catch(err) {
             notification.error({
-                message: 'Error al agregar registro de KM',
+                message: 'Error al agregar registro de KM final',
                 description: `${err}`
             })
         }
