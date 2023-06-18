@@ -29,7 +29,16 @@ const ProductionTable = () => {
             const snapDoc = await getDoc(docRef);
             setError(false);
             obj = snapDoc.data();
-            obj.fecha = dayjs.unix(obj.fecha.seconds).format('lll');
+
+            if (obj.fecha) {
+                obj.fecha = dayjs.unix(obj.fecha.seconds).format('lll');
+                obj.key = fakeId;
+                setProduction([obj]);
+                return;
+            }
+
+            obj.fechaInit = dayjs.unix(obj.fechaInit?.seconds).format('lll');
+            obj.fechaFin = dayjs.unix(obj.fechaFin?.seconds).format('lll') || null;
             obj.key = fakeId;
             setProduction([obj]);
 
@@ -40,13 +49,14 @@ const ProductionTable = () => {
                 message: 'Error al obtener informacion',
                 description: `No existen datos para la fecha ${date}`
             })
-            return
+
+            return;
         }
     }
 
     const handleDateChange = (date) => {
-        setError(false)
-        setDate(dayjs(date).format('DD-MM-YYYY'))
+        setError(false);
+        setDate(dayjs(date).format('DD-MM-YYYY'));
     }
 
     const handleExport = () => {
@@ -59,14 +69,22 @@ const ProductionTable = () => {
             return
         } 
 
-        const wb = utils.book_new()
-        const ws = utils.json_to_sheet(production)
-        utils.book_append_sheet(wb, ws, date)
-        writeFile(wb, "Kilometraje_" + date + ".xlsx")
+        const wb = utils.book_new();
+        const ws = utils.json_to_sheet(production);
+        utils.book_append_sheet(wb, ws, date);
+        writeFile(wb, "Kilometraje_" + date + ".xlsx");
     }
 
-    const columns = [
+    const oldColumns = [
         { title: 'Fecha', dataIndex: 'fecha', key: 'fecha' },
+        { title: 'KM Inicial', dataIndex: 'kmInicial', key: 'kmInicial' },
+        { title: 'KM Final', dataIndex: 'kmFinal', key: 'kmFinal' },
+        { title: 'KM Recorridos', dataIndex: 'kmRecorrido', key: 'kmRecorrido' }
+    ]
+
+    const newColumns = [
+        { title: 'Fecha inicial', dataIndex: 'fechaInit', key: 'fechaInit' },
+        { title: 'Fecha final', dataIndex: 'fechaFin', key: 'fechaFin' },
         { title: 'KM Inicial', dataIndex: 'kmInicial', key: 'kmInicial' },
         { title: 'KM Final', dataIndex: 'kmFinal', key: 'kmFinal' },
         { title: 'KM Recorridos', dataIndex: 'kmRecorrido', key: 'kmRecorrido' }
@@ -87,9 +105,9 @@ const ProductionTable = () => {
     )
 
     useEffect(() => {
-        getData()
-        setError(false)
-    }, [date])
+        getData();
+        setError(false);
+    }, [date]);
 
     return (
         <>
@@ -99,7 +117,7 @@ const ProductionTable = () => {
                 headStyle={{ backgroundColor: '#383c44', color: '#fff', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}
             >
                 <Table
-                    columns={columns}
+                    columns={production[0]?.fecha ? oldColumns : newColumns}
                     dataSource={production}
                     pagination={false}
                     scroll={{ x: 1 }}

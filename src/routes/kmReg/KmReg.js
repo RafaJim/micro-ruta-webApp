@@ -32,7 +32,8 @@ const KmReg = () => {
                 kmInicial: parseInt(kmInit),
                 kmFinal: parseInt(kmFinal),
                 kmRecorrido: parseInt(kmFinal - kmInit),
-                fecha: Timestamp.fromDate(new Date())
+                fechaInit: Timestamp.fromDate(new Date()),
+                fechaFin: Timestamp.fromDate(new Date())
             })
 
             notification.success({
@@ -59,7 +60,8 @@ const KmReg = () => {
                 kmInicial: parseInt(kmInit),
                 kmFinal: parseInt(0),
                 kmRecorrido: parseInt(0),
-                fecha: Timestamp.fromDate(new Date())
+                fechaInit: Timestamp.fromDate(new Date()),
+                fechaFin: null
             })
 
             notification.success({
@@ -88,7 +90,7 @@ const KmReg = () => {
             await updateDoc(docRef, {
                 kmFinal: parseInt(kmFinal),
                 kmRecorrido: parseInt(kmFinal - kmInicial),
-                fecha: Timestamp.fromDate(new Date())
+                fechaFin: Timestamp.fromDate(new Date())
             })
 
             notification.success({
@@ -98,7 +100,7 @@ const KmReg = () => {
         } catch(err) {
             notification.error({
                 message: 'Error al agregar registro de KM final',
-                description: `${err}`
+                description: `No se puede agregar el km final sin antes registrar el inicial. O registre ambos.`
             })
         }
 
@@ -126,7 +128,7 @@ const KmReg = () => {
                     </Card>
                 </Col>
                 <Col span={24} style={{ paddingTop: '2%' }}>
-                    { isAdmin && <KmTable />}
+                    { isAdmin ? <KmTable /> : null }
                 </Col>
             </Row>
         </>
