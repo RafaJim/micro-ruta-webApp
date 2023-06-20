@@ -128,4 +128,4 @@ const ProductionTable = () => {
     )
 }
  
-export default ProductionTable
+export default ProductionTable;
