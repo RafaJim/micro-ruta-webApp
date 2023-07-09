@@ -3,74 +3,73 @@ import './styles/showSales.css';
 import BalanceDay from './components/BalanceDay';
 import BalanceDayDiffPrice from './components/BalanceDayDiffPrice';
 
-import { utils, writeFile } from 'xlsx'
-import dayjs from 'dayjs'
-import localizedFormat from 'dayjs/plugin/localizedFormat'
+import { utils, writeFile } from 'xlsx';
+import dayjs from 'dayjs';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
 
-import { DataGrid } from '@mui/x-data-grid'
-import TextField from "@mui/material/TextField"
+import { DataGrid } from '@mui/x-data-grid';
+import TextField from '@mui/material/TextField';
 import CommentIcon from '@mui/icons-material/Comment';
 
-import { notification, Col, Row, Typography, Card, Modal } from 'antd'
+import {
+    notification,Col, Row, Typography, Card, Modal,
+} from 'antd';
 import {
     DownloadOutlined
-  } from "@ant-design/icons"
+  } from '@ant-design/icons';
 
-import firebaseApp from "../../firebase-config"
-import { getFirestore, doc, onSnapshot, getDoc } from 'firebase/firestore'
+import firebaseApp from '../../firebase-config';
+import { getFirestore, doc, onSnapshot, getDoc } from 'firebase/firestore';
 
 const { Title } = Typography;
 
 const ShowSales = () => {
-    let data = []
-    const db = getFirestore(firebaseApp)
+    let data = [];
+    const db = getFirestore(firebaseApp);
 
-    const [sales, setSales] = useState(data)
-    const [specialSales, setSpecialSales] = useState(data)
-    const [inventoryDay, setInventoryDay] = useState(data)
-    const [fechaDoc, setFechaDoc] = useState(dayjs().format('DD-MM-YYYY'))
-    const [error, setError] = useState(false)
-    const [isModalOpen, setIsModalOpen] = useState(false)
-    const [comment, setComment] = useState('')
+    const [sales, setSales] = useState(data);
+    const [specialSales, setSpecialSales] = useState(data);
+    const [fechaDoc, setFechaDoc] = useState(dayjs().format('DD-MM-YYYY'));
+    const [error, setError] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [comment, setComment] = useState('');
 
     const handleOk = () => {
-        setIsModalOpen(false)
+        setIsModalOpen(false);
     }
 
     const handleCancel = () => {
-        setIsModalOpen(false)
+        setIsModalOpen(false);
     }
     
     const getData = async () => {
-        const docRef = doc(db, 'ventas', fechaDoc)
-        const docRefSpec = doc(db, 'ventasEspeciales', fechaDoc)
-        dayjs.extend(localizedFormat)
-        let obj = {}
-        let objEspec = {}
-        let arrAux = []
-        let res = []
-        let resEspec = []
-        let resInventory = []
-        let id = 0
+        const docRef = doc(db, 'ventas', fechaDoc);
+        const docRefSpec = doc(db, 'ventasEspeciales', fechaDoc);
+        dayjs.extend(localizedFormat);
+        let obj = {};
+        let objEspec = {};
+        let arrAux = [];
+        let res = [];
+        let resEspec = [];
+        let id = 0;
 
         if(fechaDoc === dayjs().format('DD-MM-YYYY')) {
             //VENTAS NORMALES DEL DIA
             onSnapshot(docRef, (doc) => {
-                obj = doc.data()
+                obj = doc.data();
                 try {
-                    arrAux = Object.values(obj)
+                    arrAux = Object.values(obj);
                 } catch (err) {
-                    setError(true)
+                    setError(true);
                     notification.error({
                         message: "No se pudo obtener datos {hoy normal}",
                         description: 'Esto debido a que no hay registros del dia de hoy'
                     })
-                    return
+                    return;
                 }
-                setError(false)
+                setError(false);
                 
-                res = []
-                resInventory = []
+                res = [];
 
                 arrAux.map((item) => {
                     res.push({
@@ -91,41 +90,28 @@ const ShowSales = () => {
                         isModify: item.isModify
                     })
 
-                    resInventory.push({
-                        id: id,
-                        cliente: item.cliente,
-                        lunes: item.inventarioDia['lunes'],
-                        martes: item.inventarioDia['martes'],
-                        miercoles: item.inventarioDia['miercoles'],
-                        jueves: item.inventarioDia['jueves'],
-                        viernes: item.inventarioDia['viernes']
-                    })
-
-                    id++
-                    return null
+                    id++;
+                    return null;
                 })
-                setSales(res)
-                setInventoryDay(resInventory)
+                setSales(res);
             })
 
             //VENTAS ESPECIALES DEL DIA
             onSnapshot(docRefSpec, docSpec => {
-                objEspec = docSpec.data()
+                objEspec = docSpec.data();
                 try {
-                    arrAux = Object.values(objEspec)
+                    arrAux = Object.values(objEspec);
                 } catch (err) {
-                    setSpecialSales([])
-                    // setError(true)
+                    setSpecialSales([]);
                     notification.error({
                         message: "No se pudo obtener datos {hoy especial}",
                         description: 'Esto debido a que no hay registros del dia de hoy'
                     })
-                    return
+                    return;
                 }
-                setError(false)
+                setError(false);
                 
-                resEspec = []
-                resInventory = []
+                resEspec = [];
 
                 arrAux.map((item) => {
                     resEspec.push({
@@ -146,20 +132,18 @@ const ShowSales = () => {
                         isModify: item.isModify
                     })
 
-                    id++
-                    return null
+                    id++;
+                    return null;
                 })
-                setSpecialSales(resEspec)
-                // inventoryDay.push(resInventory)
-                // setInventoryDay(resInventory)
+                setSpecialSales(resEspec);
             })
         } else {
             //VENTA NORMAL CUALQUIER DIA
            await getDoc(docRef)
             .then((snapshot) => {
-                obj = snapshot.data()
-                arrAux = Object.values(obj)
-                setError(false)
+                obj = snapshot.data();
+                arrAux = Object.values(obj);
+                setError(false);
 
                 arrAux.map((item) => {
                     res.push({
@@ -180,26 +164,14 @@ const ShowSales = () => {
                         isModify: item.isModify
                     })
 
-                    resInventory.push({
-                        id: id,
-                        cliente: item.cliente,
-                        lunes: item.inventarioDia['lunes'],
-                        martes: item.inventarioDia['martes'],
-                        miercoles: item.inventarioDia['miercoles'],
-                        jueves: item.inventarioDia['jueves'],
-                        viernes: item.inventarioDia['viernes']
-                    })
-
-                    id++
-                    return null
+                    id++;
+                    return null;
                 })
-                setSales(res)
-                setInventoryDay(resInventory)
+                setSales(res);
             })
             .catch(err => {
-                setSales([])
-                setInventoryDay([])
-                setError(true)
+                setSales([]);
+                setError(true);
                 notification.error({
                     message: 'Error al obtener informacion {fecha normal}',
                     description: `No existen datos para la fecha ${fechaDoc}`
@@ -209,9 +181,9 @@ const ShowSales = () => {
             //VENTAS ESPECIAL CUALQUIER DIA
             await getDoc(docRefSpec)
             .then((snapshot) => {
-                objEspec = snapshot.data() || {}
-                arrAux = Object.values(objEspec)
-                setError(false)
+                objEspec = snapshot.data() || {};
+                arrAux = Object.values(objEspec);
+                setError(false);
 
 
                 arrAux.map((item) => {
@@ -233,15 +205,14 @@ const ShowSales = () => {
                         isModify: item.isModify
                     })
 
-                    id++
-                    return null
+                    id++;
+                    return null;
                 })
 
-                setSpecialSales(resEspec)
+                setSpecialSales(resEspec);
             })
             .catch(err => {
-                setSpecialSales([])
-                setInventoryDay([])
+                setSpecialSales([]);
                 // setError(true)
                 notification.error({
                     message: 'Error al obtener informacion {fecha especial}',
@@ -252,8 +223,8 @@ const ShowSales = () => {
     }
 
     const handleDateChange = (date) => {
-        setError(false)
-        setFechaDoc(dayjs(date).format('DD-MM-YYYY'))
+        setError(false);
+        setFechaDoc(dayjs(date).format('DD-MM-YYYY'));
     }
 
     const handleExport = (docName, docContent) => {
@@ -263,18 +234,18 @@ const ShowSales = () => {
                 description: 'No se puede exportar datos de una fecha no existente'
             })
             
-            return
+            return;
         } 
 
-        const wb = utils.book_new()
-        const ws = utils.json_to_sheet(docContent)
-        utils.book_append_sheet(wb, ws, fechaDoc)
-        writeFile(wb, docName + fechaDoc + ".xlsx")
+        const wb = utils.book_new();
+        const ws = utils.json_to_sheet(docContent);
+        utils.book_append_sheet(wb, ws, fechaDoc);
+        writeFile(wb, docName + fechaDoc + ".xlsx");
     }
 
     const openComment = (comment) => {
-        setComment(comment)
-        setIsModalOpen(true)
+        setComment(comment);
+        setIsModalOpen(true);
     }
 
     const columns = [
@@ -315,15 +286,6 @@ const ShowSales = () => {
         { field: 'cambio', headerName: 'Cambio ($)', width: 90, headerAlign: 'center' },
     ]
 
-    const columnsInventory = [
-        { field: 'cliente', headerName: 'Cliente', width: 120, headerAlign: 'center' },
-        { field: 'lunes', headerName: 'Lunes', width: 90, headerAlign: 'center' },
-        { field: 'martes', headerName: 'Martes', width: 90, headerAlign: 'center' },
-        { field: 'miercoles', headerName: 'Miercoles', width: 90, headerAlign: 'center' },
-        { field: 'jueves', headerName: 'Jueves', width: 90, headerAlign: 'center' },
-        { field: 'viernes', headerName: 'Viernes', width: 90, headerAlign: 'center' },
-    ]
-
     const titleContent = (
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <TextField 
@@ -337,26 +299,18 @@ const ShowSales = () => {
             <h2 style={{ color: '#fff' }}>Venta normal</h2>
             <DownloadOutlined onClick={() => handleExport('Frijoles_', sales)} style={{ fontSize: 30, color: '#fff' }}/>
         </div>
-    )
+    );
 
     const titleContentSpecials = (
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            {/* <TextField 
-                type='date' 
-                label="Fecha" 
-                variant="standard" 
-                defaultValue={dayjs().format('YYYY-MM-DD')} 
-                onChange={ e => handleDateChange(e.target.value) } 
-                sx={{ input:{ color: '#fff' } }} 
-            /> */}
             <h2 style={{ color: '#fff' }}>Venta especial</h2>
             <DownloadOutlined onClick={() => handleExport('VentasEspeciales_', specialSales)} style={{ fontSize: 30, color: '#fff' }}/>
         </div>
-    )
+    );
 
     useEffect(() => {
-        getData()
-        setError(false)
+        getData();
+        setError(false);
     }, [fechaDoc])
     
     return (
@@ -410,35 +364,15 @@ const ShowSales = () => {
                 </Col>
             </Row>
 
-            {/* TABLA INVENTARIO */}
             <Row style={{ justifyContent: 'space-between' }}>
+                {/* TABLA DE CORTE A PRECIO NORMAL */}
                 <Col md={11} style={{ marginTop: '1.5%', marginBottom: '1.5%' }}>
-                    <Card
-                        title="Inventario de etiquetas"
-                        bordered='true'
-                        headStyle={{ backgroundColor: '#383c44', color: '#fff', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}
-                        extra={<DownloadOutlined onClick={() => handleExport('Inventario_', inventoryDay)} style={{ fontSize: 30, color: '#fff' }} />}
-                    >
-                        <DataGrid
-                            rows={inventoryDay}
-                            columns={columnsInventory}
-                            pageSize={7}
-                            rowsPerPageOptions={[7]}
-                            disableSelectionOnClick
-                            autoHeight={true}
-                            // sx={{ '& .MuiDataGrid-cell--textCenter': { align:"center" } }}
-                        />
-                    </Card>
+                    <BalanceDay fechaDoc={fechaDoc} error={error} />
                 </Col>
 
-                {/* TABLA CORTE DEL DIA */}
-                <Col md={12}>
-                    <Col md={24} style={{ marginTop: '3.5%' }}>
-                        <BalanceDay fechaDoc={fechaDoc} error={error} />
-                    </Col>
-                    <Col md={24} style={{ marginTop: '5%'}}>
-                        <BalanceDayDiffPrice data={sales} fechaDoc={fechaDoc} error={error} />
-                    </Col>
+                {/* TABLA DE CORTE A DIFERENTE PRECIO */}
+                <Col md={12} style={{ marginTop: '1.5%', marginBottom: '1.5%' }}>
+                    <BalanceDayDiffPrice data={sales} fechaDoc={fechaDoc} error={error} />
                 </Col>
             </Row>
         </>
