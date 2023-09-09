@@ -15,7 +15,7 @@ import {
     notification,Col, Row, Typography, Card, Modal,
 } from 'antd';
 import {
-    DownloadOutlined
+    DownloadOutlined, GlobalOutlined,
   } from '@ant-design/icons';
 
 import firebaseApp from '../../firebase-config';
@@ -35,11 +35,11 @@ const ShowSales = () => {
     const [comment, setComment] = useState('');
 
     const handleOk = () => {
-        setIsModalOpen(false);
+      setIsModalOpen(false);
     }
 
     const handleCancel = () => {
-        setIsModalOpen(false);
+      setIsModalOpen(false);
     }
     
     const getData = async () => {
@@ -117,6 +117,7 @@ const ShowSales = () => {
                     resEspec.push({
                         id: id,
                         comentario: item.comentarios,
+                        ubicacion: { lat: item.latitud, long: item.longitud },
                         alias: item.alias,
                         fecha: dayjs.unix(item.fecha.seconds).format('DD/MM/YYYY'),
                         hora: dayjs.unix(item.fecha.seconds).format('HH:mm:ss'),
@@ -185,12 +186,12 @@ const ShowSales = () => {
                 arrAux = Object.values(objEspec);
                 setError(false);
 
-
                 arrAux.map((item) => {
                     resEspec.push({
                         id: id,
                         comentario: item.comentarios,
-                        cliente: item.cliente,
+                        ubicacion: { lat: item.latitud, long: item.longitud },
+                        cliente: item.alias,
                         fecha: dayjs.unix(item.fecha.seconds).format('DD/MM/YYYY'),
                         hora: dayjs.unix(item.fecha.seconds).format('HH:mm:ss'),
                         frijolesEntrega: item.frijolesEntrega,
@@ -223,30 +224,38 @@ const ShowSales = () => {
     }
 
     const handleDateChange = (date) => {
-        setError(false);
-        setFechaDoc(dayjs(date).format('DD-MM-YYYY'));
-    }
+      setError(false);
+      setFechaDoc(dayjs(date).format('DD-MM-YYYY'));
+    };
 
     const handleExport = (docName, docContent) => {
-        if(error) {
-            notification.error({
-                message: 'Error al exportar',
-                description: 'No se puede exportar datos de una fecha no existente'
-            })
-            
-            return;
-        } 
+      if(error) {
+        notification.error({
+            message: 'Error al exportar',
+            description: 'No se puede exportar datos de una fecha no existente'
+        })
+    
+        return;
+      }
 
-        const wb = utils.book_new();
-        const ws = utils.json_to_sheet(docContent);
-        utils.book_append_sheet(wb, ws, fechaDoc);
-        writeFile(wb, docName + fechaDoc + ".xlsx");
-    }
+      docContent.map(obj => {
+        const { lat, long } = obj.ubicacion;
+        const ubication = `${lat}, ${long}`;
+        obj.ubicacion = ubication;
+        delete obj['id'];
+        delete obj['isModify'];
+      });
+
+      const wb = utils.book_new();
+      const ws = utils.json_to_sheet(docContent);
+      utils.book_append_sheet(wb, ws, fechaDoc);
+      writeFile(wb, docName + fechaDoc + ".xlsx");
+    };
 
     const openComment = (comment) => {
         setComment(comment);
         setIsModalOpen(true);
-    }
+    };
 
     const columns = [
         { field: 'comentarios', headerName: 'Comentarios', sortable: 'false', width: 80, headerAlign: 'center', renderCell: (params) => {
@@ -274,11 +283,16 @@ const ShowSales = () => {
                 params.row.comentario ? <CommentIcon onClick={() => openComment(params.row.comentario)} style={{ cursor: "pointer" }}/>:null
             )
           } },
-        { field: 'alias', headerName: 'Cliente', width: 170, headerAlign: 'center' },
+        { field: 'ubicacion', headerName: 'Ubicacion', sortable: 'false', width: 100, headerAlign: 'center', renderCell: (params) => {
+            return <GlobalOutlined onClick={() => openGoogleMaps(params.row.ubicacion)} style={{ cursor: "pointer", fontSize: '25px' }}/>
+        } },
+        { field: 'cliente', headerName: 'Cliente', width: 250, headerAlign: 'center' },
         { field: 'fecha', headerName: 'Fecha venta', width: 150, headerAlign: 'center' },
         { field: 'hora', headerName: 'Hora venta', width: 150, headerAlign: 'center' },
         { field: 'frijolesEntrega', headerName: 'Frijoles', width: 70, headerAlign: 'center' },
+        { field: 'frijolesDevolucion', headerName: 'Frijoles devueltos', width: 130, headerAlign: 'center' },
         { field: 'frijolesEloteEntrega', headerName: 'Frijoles con elote', width: 130, headerAlign: 'center' },
+        { field: 'frijolesEloteDevolucion', headerName: 'Frijoles con elote devueltos', width: 190, headerAlign: 'center' },
         { field: 'totalFrijol', headerName: 'Total frijol ($)', width: 100, headerAlign: 'center' },
         { field: 'totalFrijolElote', headerName: 'Total frijol con elote ($)', width: 180, headerAlign: 'center' },
         { field: 'total', headerName: 'Total de la venta ($)', width: 160, headerAlign: 'center' },
@@ -302,16 +316,22 @@ const ShowSales = () => {
     );
 
     const titleContentSpecials = (
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <h2 style={{ color: '#fff' }}>Venta especial</h2>
-            <DownloadOutlined onClick={() => handleExport('VentasEspeciales_', specialSales)} style={{ fontSize: 30, color: '#fff' }}/>
-        </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <h2 style={{ color: '#fff' }}>Venta especial</h2>
+        <DownloadOutlined onClick={() => handleExport('VentasEspeciales_', specialSales)} style={{ fontSize: 30, color: '#fff' }}/>
+      </div>
     );
+
+    const openGoogleMaps = params => {
+      const { lat, long } = params;
+      const googleMapURL = `https://www.google.com/maps?q=${lat},${long}`
+      window.open(googleMapURL, '_blank');
+    };
 
     useEffect(() => {
         getData();
         setError(false);
-    }, [fechaDoc])
+    }, [fechaDoc]);
     
     return (
         <>
