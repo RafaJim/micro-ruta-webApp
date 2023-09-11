@@ -238,13 +238,15 @@ const ShowSales = () => {
         return;
       }
 
-      docContent.map(obj => {
-        const { lat, long } = obj.ubicacion;
-        const ubication = `${lat}, ${long}`;
-        obj.ubicacion = ubication;
-        delete obj['id'];
-        delete obj['isModify'];
-      });
+      if (docName === 'VentasEspeciales_') {
+          docContent.map(obj => {
+            const { lat, long } = obj.ubicacion;
+            const ubication = `${lat}, ${long}`;
+            obj.ubicacion = ubication;
+            delete obj['id'];
+            delete obj['isModify'];
+          });
+      }
 
       const wb = utils.book_new();
       const ws = utils.json_to_sheet(docContent);
